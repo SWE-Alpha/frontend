@@ -66,35 +66,33 @@ export default function CartPage() {
     }, 2000)
   }
 
-  if (showCheckout) {
-    return (
-      <div className="fixed inset-0 bg-white z-50 max-w-sm mx-auto flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-orange-500 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold mb-2">Processing Order...</h2>
-          <p className="text-gray-600">Please wait while we prepare your order</p>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="fixed inset-0 bg-white z-50 max-w-sm mx-auto overflow-y-auto">
-      {/* Header */}
-      <div className="bg-orange-500 px-4 py-3">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" className="text-white hover:bg-orange-600 p-2" onClick={() => router.back()}>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">Your Cart</h1>
-            <p className="text-sm text-white/90">{cartCount} items</p>
+    <div className="min-h-screen flex flex-col bg-white">
+      {showCheckout ? (
+        <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
+          <div className="text-center p-6 max-w-sm w-full">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-orange-500 mx-auto mb-4"></div>
+            <h2 className="text-xl font-semibold mb-2">Processing Order...</h2>
+            <p className="text-gray-600">Please wait while we prepare your order</p>
           </div>
         </div>
-      </div>
+      ) : (
+        <>
+          {/* Cart Header */}
+          <div className="sticky top-0 z-10 bg-orange-500 px-4 py-3">
+            <div className="flex items-center gap-4 max-w-4xl mx-auto">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-orange-600 p-2" onClick={() => router.back()}>
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <div className="flex-1">
+                <h1 className="text-xl font-bold text-white">Your Cart</h1>
+                <p className="text-sm text-white/90">{cartCount} items</p>
+              </div>
+            </div>
+          </div>
 
-      {/* Cart Content */}
-      <div className="flex-1 px-4 py-4">
+          {/* Cart Content */}
+          <div className="flex-1 px-4 py-4 max-w-4xl mx-auto w-full">
         {cartItems.length === 0 ? (
           <div className="text-center py-16">
             <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -205,7 +203,9 @@ export default function CartPage() {
             </div>
           </>
         )}
-      </div>
+          </div>
+        </>
+      )}
     </div>
-  )
+  );
 }

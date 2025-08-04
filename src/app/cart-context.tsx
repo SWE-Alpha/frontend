@@ -28,6 +28,8 @@ interface CartContextType {
   cartItems: CartItem[];
   cartCount: number;
   cartTotal: number;
+  isLoading: boolean;
+  error: string | null;
   addToCart: (item: CartItemInput) => void;
   updateCartItem: (id: string, updates: Partial<Omit<CartItem, 'id'>>) => void;
   removeFromCart: (id: string) => void;
@@ -39,20 +41,34 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isMounted, setIsMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Load cart from localStorage on mount
   useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      setCartItems(JSON.parse(savedCart));
+    try {
+      const savedCart = localStorage.getItem('cart');
+      if (savedCart) {
+        setCartItems(JSON.parse(savedCart));
+      }
+    } catch (err) {
+      setError('Failed to load cart. Please refresh the page.');
+      console.error('Error loading cart from localStorage:', err);
+    } finally {
+      setIsMounted(true);
+      setIsLoading(false);
     }
-    setIsMounted(true);
   }, []);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
-    if (isMounted) {
+    if (!isMounted) return;
+    
+    try {
       localStorage.setItem('cart', JSON.stringify(cartItems));
+    } catch (err) {
+      setError('Failed to save cart. Your changes may not be saved.');
+      console.error('Error saving cart to localStorage:', err);
     }
   }, [cartItems, isMounted]);
 
@@ -61,58 +77,67 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addToCart = (itemInput: CartItemInput) => {
     setCartItems((prevItems) => {
-      // Ensure we have a string ID
-      const itemId = String(itemInput.id);
-      const existingItemIndex = prevItems.findIndex((i) => i.id === itemId);
-      
-      // Process add-ons with defaults
-      const addOns = {
-        friedEgg: itemInput.addOns?.friedEgg || false,
-        cheese: itemInput.addOns?.cheese || false,
-        vegetable: itemInput.addOns?.vegetable || false,
-      };
-      
-      // Calculate add-ons total
-      const addOnsTotal = 
-        (addOns.friedEgg ? 5 : 0) + 
-        (addOns.cheese ? 5 : 0) + 
-        (addOns.vegetable ? 7 : 0);
-      
-      // Process the item
-      const quantity = itemInput.quantity || 1;
-      const itemTotal = (itemInput.price + addOnsTotal) * quantity;
-      
-      if (existingItemIndex >= 0) {
-        // Item already exists, update it
-        const existingItem = prevItems[existingItemIndex];
-        const newQuantity = quantity + existingItem.quantity;
+      try {
+        // Create a unique ID that includes the add-ons state
+        const addOnsKey = [
+          itemInput.addOns?.friedEgg ? 'egg' : '',
+          itemInput.addOns?.cheese ? 'cheese' : '',
+          itemInput.addOns?.vegetable ? 'veg' : ''
+        ].filter(Boolean).join('-');
         
-        const updatedItem: CartItem = {
-          ...existingItem,
-          ...itemInput,
-          id: itemId,
-          addOns,
-          quantity: newQuantity,
-          note: itemInput.note !== undefined ? itemInput.note : existingItem.note,
-          itemTotal: (itemInput.price + addOnsTotal) * newQuantity
+        const itemId = `${itemInput.id}-${addOnsKey}`;
+        const existingItemIndex = prevItems.findIndex((i) => i.id === itemId);
+        
+        // Process add-ons with defaults
+        const addOns = {
+          friedEgg: itemInput.addOns?.friedEgg || false,
+          cheese: itemInput.addOns?.cheese || false,
+          vegetable: itemInput.addOns?.vegetable || false,
         };
         
-        const newItems = [...prevItems];
-        newItems[existingItemIndex] = updatedItem;
-        return newItems;
+        // Calculate add-ons total
+        const addOnsTotal = 
+          (addOns.friedEgg ? 5 : 0) + 
+          (addOns.cheese ? 5 : 0) + 
+          (addOns.vegetable ? 7 : 0);
+        
+        // Process the item
+        const quantity = itemInput.quantity || 1;
+        const itemTotal = (itemInput.price + addOnsTotal) * quantity;
+        
+        if (existingItemIndex >= 0) {
+          // Item with same ID and add-ons exists, update quantity
+          const existingItem = prevItems[existingItemIndex];
+          const newQuantity = quantity + existingItem.quantity;
+          
+          const updatedItem: CartItem = {
+            ...existingItem,
+            quantity: newQuantity,
+            note: itemInput.note !== undefined ? itemInput.note : existingItem.note,
+            itemTotal: (existingItem.price + addOnsTotal) * newQuantity
+          };
+          
+          const newItems = [...prevItems];
+          newItems[existingItemIndex] = updatedItem;
+          return newItems;
+        }
+
+        // Item doesn't exist, add new item
+        const newItem: CartItem = {
+          ...itemInput,
+          id: itemId,
+          quantity,
+          addOns,
+          note: itemInput.note || '',
+          itemTotal,
+        };
+
+        return [...prevItems, newItem];
+      } catch (err) {
+        setError('Failed to add item to cart. Please try again.');
+        console.error('Error adding item to cart:', err);
+        return prevItems;
       }
-
-      // Item doesn't exist, add new item
-      const newItem: CartItem = {
-        ...itemInput,
-        id: itemId,
-        quantity,
-        addOns,
-        note: itemInput.note || '',
-        itemTotal,
-      };
-
-      return [...prevItems, newItem];
     });
   };
 
@@ -156,6 +181,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         cartItems,
         cartCount,
         cartTotal,
+        isLoading,
+        error,
         addToCart,
         updateCartItem,
         removeFromCart,
