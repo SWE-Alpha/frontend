@@ -1,12 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import Image from "next/image";
+import { useCart } from "@/app/cart-context";
 import {
   Bars3Icon,
   XMarkIcon,
   UserIcon,
   ShoppingBagIcon,
+  ShoppingCartIcon,
+  BellIcon,
   HeartIcon,
   Cog6ToothIcon,
   QuestionMarkCircleIcon,
@@ -17,6 +21,7 @@ import {
 
 const Navbar = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const { cartCount } = useCart();
 
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
@@ -45,7 +50,19 @@ const Navbar = () => {
           </div>
         </div>
         
-        <div className="w-6"></div> {/* Spacer for centering */}
+        <div className="flex items-center space-x-4">
+          <button className="p-1">
+            <BellIcon className="w-6 h-6 text-gray-700" />
+          </button>
+          <Link href="/cart" className="relative">
+            <ShoppingCartIcon className="w-6 h-6 text-gray-700" />
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {cartCount > 9 ? '9+' : cartCount}
+              </span>
+            )}
+          </Link>
+        </div>
       </nav>
 
       {/* Sidebar Drawer */}

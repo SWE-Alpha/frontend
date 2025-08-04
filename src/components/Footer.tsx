@@ -1,9 +1,13 @@
 import React from "react";
 import Image from "next/image";
-// Adjust the path as necessary
-const Footer = () => {
+
+interface FooterProps {
+  className?: string;
+}
+
+const Footer: React.FC<FooterProps> = ({ className = '' }) => {
   return (
-    <footer className="bg-black text-[#FFEAD7] flex flex-col px-2 py-3 ">
+    <footer className={`bg-black text-[#FFEAD7] flex flex-col px-2 py-3 ${className}`}>
       {/*Buddies Inn logo section*/}
       <div className="">
         <Image src="/logo.png" alt="Buddies Inn logo" width={65} height={60} />

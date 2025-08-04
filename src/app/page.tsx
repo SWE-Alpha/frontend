@@ -2,8 +2,12 @@
 
 import React, { useState, useMemo, useEffect } from "react"
 import { Search, Plus, ChevronLeft, ChevronRight } from "lucide-react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useCart } from "./cart-context"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 interface MenuItem {
   id: number;
@@ -40,6 +44,8 @@ const FoodOrderingApp = () => {
   ]
   
   const [currentSlide, setCurrentSlide] = useState(0)
+  const { addToCart } = useCart()
+  const router = useRouter()
   
   // Auto-slide every 5 seconds
   useEffect(() => {
@@ -370,28 +376,73 @@ const FoodOrderingApp = () => {
         {filteredItems.length > 0 ? (
           <div className="grid grid-cols-2 gap-4">
             {filteredItems.map((item) => (
-              <div
-                key={`${'category' in item ? (item as MenuItem).category : activeTab}-${item.id}`}
-                className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm"
+              <a 
+                key={item.id} 
+                href={`/products/${item.id}`}
+                className="block bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-shadow"
               >
-                <div className="w-full h-24 bg-gray-100 flex items-center justify-center">
-                  <span className="text-gray-400">Image</span>
+                <div className="relative w-full aspect-[4/3] bg-gray-100">
+                  {item.image ? (
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 50vw, 33vw"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      No Image
+                    </div>
+                  )}
                 </div>
-                <div className="p-3">
-                  <h3 className="font-semibold text-sm mb-1">{item.name}</h3>
+                <div className="p-4">
+                  <h3 className="font-semibold text-gray-900">{item.name}</h3>
                   {'category' in item && (
                     <span className="text-xs text-orange-500 font-medium mb-1 block">{item.category}</span>
                   )}
-                  <p className="text-xs text-gray-600 mb-2 line-clamp-2">{item.description}</p>
+                  <p className="text-xs text-gray-500 mb-2 line-clamp-2">{item.description}</p>
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-sm">{item.price}</span>
-                    <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 h-7 text-xs">
+                    <Button 
+                      size="sm" 
+                      className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 h-7 text-xs"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // Extract numeric price from the price string (e.g., "GHC 12.00" -> 12.00)
+                        const price = parseFloat(item.price.replace(/[^0-9.]/g, ''));
+                        
+                        // Add to cart with default quantity of 1 and no add-ons
+                        addToCart({
+                          id: String(item.id),
+                          name: item.name,
+                          price: price,
+                          image: item.image,
+                          category: item.category || '',
+                          quantity: 1,
+                          addOns: {
+                            friedEgg: false,
+                            cheese: false,
+                            vegetable: false
+                          },
+                          note: ''
+                        });
+                        
+                        // Show success toast
+                        toast.success('Added to cart', {
+                          description: `${item.name} has been added to your cart`,
+                          duration: 2000,
+                          position: 'top-center'
+                        });
+                      }}
+                    >
                       <Plus className="w-3 h-3 mr-1" />
                       Add
                     </Button>
                   </div>
                 </div>
-              </div>
+              </a>
             ))}
           </div>
         ) : searchQuery ? (
