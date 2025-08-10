@@ -28,14 +28,17 @@ const Navbar = () => {
   };
 
   const navItems = [
-    { icon: HomeIcon, label: 'Home', active: true },
-    { icon: UserGroupIcon, label: 'About Us' },
-    { icon: ShoppingBagIcon, label: 'Our Menu' },
-    { icon: HeartIcon, label: 'Favorites' },
-    { icon: Cog6ToothIcon, label: 'Settings' },
-    { icon: QuestionMarkCircleIcon, label: 'Help & Support' },
-    { icon: ArrowRightOnRectangleIcon, label: 'Sign Out' },
+    { icon: HomeIcon, label: 'Home', href: '/' },
+    { icon: Cog6ToothIcon, label: 'Settings', href: '#' },
+    { icon: QuestionMarkCircleIcon, label: 'Help & Support', href: '#' },
   ];
+
+  const adminButton = {
+    icon: UserIcon,
+    label: 'Admin Login',
+    href: '/admin/login',
+    className: 'mt-4 border-t border-gray-100 pt-4',
+  };
 
   return (
     <>
@@ -98,17 +101,31 @@ const Navbar = () => {
           {/* Navigation Links */}
           <nav className="py-4">
             <ul className="space-y-1 px-3">
-              {navItems.map((item, index) => (
-                <li key={index}>
-                  <a 
-                    href="#" 
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium ${item.active ? 'bg-orange-50 text-orange-600' : 'text-gray-700 hover:bg-gray-50'}`}
-                  >
-                    <item.icon className={`w-5 h-5 ${item.active ? 'text-orange-500' : 'text-gray-400'}`} />
-                    <span>{item.label}</span>
-                  </a>
-                </li>
-              ))}
+              {navItems.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <li key={index}>
+                    <Link
+                      href={item.href}
+                      className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors text-gray-700 hover:bg-gray-50`}
+                    >
+                      <Icon className="w-5 h-5 mr-3" />
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
+              
+              {/* Admin Login Button */}
+              <li className={adminButton.className}>
+                <Link
+                  href={adminButton.href}
+                  className="flex items-center px-4 py-3 text-sm font-medium text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                >
+                  <adminButton.icon className="w-5 h-5 mr-3" />
+                  {adminButton.label}
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
