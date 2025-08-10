@@ -20,8 +20,9 @@ export interface CartItem {
   itemTotal: number;
 }
 
-export type CartItemInput = Omit<CartItem, 'id' | 'itemTotal'> & {
+export type CartItemInput = Omit<CartItem, 'id'> & {
   id: string | number;
+  itemTotal?: number; // Make it optional since it can be calculated
 };
 
 interface CartContextType {

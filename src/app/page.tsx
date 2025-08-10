@@ -355,10 +355,10 @@ const FoodOrderingApp = () => {
         {filteredItems.length > 0 ? (
           <div className="grid grid-cols-2 gap-4">
             {filteredItems.map((item) => (
-              <a 
+              <div 
                 key={item.id} 
-                href={`/products/${item.id}`}
-                className="block bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-shadow"
+                className="block bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                onClick={() => router.push(`/products/${item.id}`)}
               >
                 <div className="relative w-full aspect-[4/3] bg-gray-100">
                   {item.image ? (
@@ -368,16 +368,23 @@ const FoodOrderingApp = () => {
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 50vw, 33vw"
+                      priority
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      No Image
+                      <Image
+                        src="/placeholder.svg"
+                        alt={item.name}
+                        width={150}
+                        height={150}
+                        className="opacity-30"
+                      />
                     </div>
                   )}
                 </div>
                 <div className="p-4">
                   <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                  {'category' in item && (
+                  {item.category && (
                     <span className="text-xs text-orange-500 font-medium mb-1 block">{item.category}</span>
                   )}
                   <p className="text-xs text-gray-500 mb-2 line-clamp-2">{item.description}</p>
@@ -398,22 +405,18 @@ const FoodOrderingApp = () => {
                           name: item.name,
                           price: price,
                           image: item.image,
-                          category: item.category || '',
+                          category: item.category || 'Other',
                           quantity: 1,
                           addOns: {
                             friedEgg: false,
                             cheese: false,
                             vegetable: false
                           },
-                          note: ''
+                          note: "",
+                          itemTotal: price,
                         });
                         
-                        // Show success toast
-                        toast.success('Added to cart', {
-                          description: `${item.name} has been added to your cart`,
-                          duration: 2000,
-                          position: 'top-center'
-                        });
+                        toast.success(`${item.name} added to cart!`);
                       }}
                     >
                       <Plus className="w-3 h-3 mr-1" />
@@ -421,7 +424,7 @@ const FoodOrderingApp = () => {
                     </Button>
                   </div>
                 </div>
-              </a>
+              </div>
             ))}
           </div>
         ) : searchQuery ? (
