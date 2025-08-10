@@ -126,11 +126,14 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     vegetable: 7.0,
   };
 
-  // Calculate total price including add-ons
+  // Check if the product should show add-ons (only Paninis and Hotdogs)
+  const showAddOns = product?.category === 'Paninis' || product?.category === 'Hotdogs';
+  
+  // Calculate total price including add-ons (only for food items)
   const basePrice = product ? parseFloat(product.price.replace(/[^0-9.]/g, '')) : 0;
-  const totalAddOns = Object.entries(addOns).reduce((total, [key, enabled]) => {
+  const totalAddOns = showAddOns ? Object.entries(addOns).reduce((total, [key, enabled]) => {
     return enabled ? total + (addOnPrices[key as keyof typeof addOnPrices] || 0) : total;
-  }, 0);
+  }, 0) : 0;
 
   const totalPrice = (basePrice + totalAddOns) * quantity;
 
@@ -253,27 +256,29 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           <p className="text-gray-600">{product.description}</p>
         </div>
 
-        {/* Add-ons */}
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">Add-ons</h2>
-          <div className="space-y-2">
-            <SimpleSwitch 
-              checked={addOns.cheese} 
-              onChange={(checked: boolean) => setAddOns(prev => ({...prev, cheese: checked}))}
-              label={`Extra Cheese (GHC ${addOnPrices.cheese.toFixed(2)})`}
-            />
-            <SimpleSwitch 
-              checked={addOns.friedEgg} 
-              onChange={(checked: boolean) => setAddOns(prev => ({...prev, friedEgg: checked}))}
-              label={`Fried Egg (GHC ${addOnPrices.friedEgg.toFixed(2)})`}
-            />
-            <SimpleSwitch 
-              checked={addOns.vegetable} 
-              onChange={(checked: boolean) => setAddOns(prev => ({...prev, vegetable: checked}))}
-              label={`Vegetable Mix (GHC ${addOnPrices.vegetable.toFixed(2)})`}
-            />
+        {/* Add-ons - Only show for Paninis and Hotdogs */}
+        {showAddOns && (
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-3">Add-ons</h2>
+            <div className="space-y-2">
+              <SimpleSwitch 
+                checked={addOns.cheese} 
+                onChange={(checked: boolean) => setAddOns(prev => ({...prev, cheese: checked}))}
+                label={`Extra Cheese (GHC ${addOnPrices.cheese.toFixed(2)})`}
+              />
+              <SimpleSwitch 
+                checked={addOns.friedEgg} 
+                onChange={(checked: boolean) => setAddOns(prev => ({...prev, friedEgg: checked}))}
+                label={`Fried Egg (GHC ${addOnPrices.friedEgg.toFixed(2)})`}
+              />
+              <SimpleSwitch 
+                checked={addOns.vegetable} 
+                onChange={(checked: boolean) => setAddOns(prev => ({...prev, vegetable: checked}))}
+                label={`Vegetable Mix (GHC ${addOnPrices.vegetable.toFixed(2)})`}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Special Instructions */}
         <div className="mb-6">
