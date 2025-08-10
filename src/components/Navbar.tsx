@@ -33,7 +33,7 @@ const Navbar = () => {
     // Close the modal
     setIsLoginModalOpen(false);
     // Redirect to admin dashboard
-    router.push('/admin/dashboard');
+    router.push('/admin');
   };
 
   const toggleDrawer = () => {
