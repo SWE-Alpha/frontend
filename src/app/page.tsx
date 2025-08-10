@@ -19,7 +19,7 @@ interface MenuItem {
 }
 
 const FoodOrderingApp = () => {
-  const [activeTab, setActiveTab] = useState("Hot Dog")
+  const [activeTab, setActiveTab] = useState("Paninis")
   const [searchQuery, setSearchQuery] = useState("")
 
   const specialOffers = [
@@ -57,171 +57,150 @@ const FoodOrderingApp = () => {
   }, [specialOffers.length])
 
   const menuItems: Record<string, MenuItem[]> = {
-    Panini: [
+    Paninis: [
       {
         id: 1,
-        name: "Italian Panini",
-        description: "Grilled panini with mozzarella and tomatoes",
+        name: "Layman",
+        description: "Egg, sausage, corn beef & Rose bread",
         price: "GHC 18.00",
         image: "/placeholder.svg?height=100&width=150",
       },
       {
         id: 2,
-        name: "Chicken Panini",
-        description: "Grilled chicken with pesto and cheese",
-        price: "GHC 22.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 3,
-        name: "Veggie Panini",
-        description: "Grilled vegetables with herb spread",
-        price: "GHC 16.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 4,
-        name: "Turkey Panini",
-        description: "Sliced turkey with avocado and cheese",
-        price: "GHC 20.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 5,
-        name: "Ham Panini",
-        description: "Ham and swiss cheese with mustard",
-        price: "GHC 19.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-    ],
-    "Hot Dog": [
-      {
-        id: 1,
-        name: "Cherry dog",
-        description: "Beef sausage with special cherry sauce",
-        price: "GHC 20.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 2,
-        name: "Chilli dog",
-        description: "Hot dog with spicy chilli and cheese",
+        name: "Original",
+        description: "Eggs, sausage, corn beef & Big bread",
         price: "GHC 25.00",
         image: "/placeholder.svg?height=100&width=150",
       },
       {
         id: 3,
+        name: "Puff daddy",
+        description: "Eggs, sausages, corn beef, cheese & BB",
+        price: "GHC 33.00",
+        image: "/placeholder.svg?height=100&width=150",
+      },
+      {
+        id: 4,
+        name: "Chairmoo",
+        description: "Eggs, sausages, corn beef, cheese & BB",
+        price: "GHC 38.00",
+        image: "/placeholder.svg?height=100&width=150",
+      },
+      {
+        id: 5,
+        name: "Legend",
+        description: "Eggs, sausages, corn beef, cheese, chicken & BB",
+        price: "GHC 45.00",
+        image: "/placeholder.svg?height=100&width=150",
+      },
+    ],
+    Hotdogs: [
+      {
+        id: 6,
+        name: "Cherry Dog",
+        description: "Relish, mustard, ketchup and raw onion",
+        price: "GHC 25.00",
+        image: "/placeholder.svg?height=100&width=150",
+      },
+      {
+        id: 7,
+        name: "Chilli Dog",
+        description: "Chilli sauce, mozzarella cheese, onions",
+        price: "GHC 30.00",
+        image: "/placeholder.svg?height=100&width=150",
+      },
+      {
+        id: 8,
         name: "Slaw Dog",
-        description: "Hot dog with fresh coleslaw topping",
-        price: "GHC 25.00",
+        description: "Cole slaw, sliced minced meat",
+        price: "GHC 35.00",
         image: "/placeholder.svg?height=100&width=150",
       },
       {
-        id: 4,
+        id: 9,
         name: "Hoagie Dog",
-        description: "Long hot dog with multiple toppings",
-        price: "GHC 35.00",
+        description: "Chilli sauce, mixed veg mayo and chicken/ minced meat",
+        price: "GHC 40.00",
         image: "/placeholder.svg?height=100&width=150",
       },
       {
-        id: 5,
+        id: 10,
         name: "Buffalo Dog",
-        description: "Hot dog with buffalo sauce and vegetables",
-        price: "GHC 35.00",
+        description: "Chilli sauce, mixed veg, mayo and chicken and minced meat",
+        price: "GHC 50.00",
         image: "/placeholder.svg?height=100&width=150",
       },
     ],
-    Bread: [
+    Beverages: [
       {
-        id: 1,
-        name: "Sourdough Loaf",
-        description: "Fresh baked sourdough bread",
-        price: "GHC 12.00",
+        id: 11,
+        name: "Yogurt juice",
+        description: "Refreshing yogurt drink",
+        price: "GHC 20.00",
         image: "/placeholder.svg?height=100&width=150",
       },
       {
-        id: 2,
-        name: "Whole Wheat",
-        description: "Healthy whole wheat bread",
+        id: 12,
+        name: "Mango juice",
+        description: "Fresh mango juice",
+        price: "GHC 20.00",
+        image: "/placeholder.svg?height=100&width=150",
+      },
+      {
+        id: 13,
+        name: "Pineapple juice",
+        description: "Tropical pineapple juice",
+        price: "GHC 20.00",
+        image: "/placeholder.svg?height=100&width=150",
+      },
+      {
+        id: 14,
+        name: "Millet juice",
+        description: "Traditional millet drink",
+        price: "GHC 20.00",
+        image: "/placeholder.svg?height=100&width=150",
+      },
+    ],
+    "Hot Drinks": [
+      {
+        id: 15,
+        name: "Single",
+        description: "Milo, Nescafé, strawberry, Mocha, Cowbell, This Way, etc",
         price: "GHC 10.00",
         image: "/placeholder.svg?height=100&width=150",
       },
       {
-        id: 3,
-        name: "French Baguette",
-        description: "Crispy French baguette",
-        price: "GHC 8.00",
+        id: 16,
+        name: "Single with milk",
+        description: "Milo, Nescafé, strawberry, Mocha, Cowbell, This Way, etc",
+        price: "GHC 13.00",
         image: "/placeholder.svg?height=100&width=150",
       },
       {
-        id: 4,
-        name: "Rye Bread",
-        description: "Traditional rye bread with seeds",
-        price: "GHC 14.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 5,
-        name: "Ciabatta",
-        description: "Italian ciabatta bread",
+        id: 17,
+        name: "Double",
+        description: "Milo, Nescafé, strawberry, Mocha, Cowbell, This Way, etc",
         price: "GHC 15.00",
         image: "/placeholder.svg?height=100&width=150",
       },
       {
-        id: 6,
-        name: "Focaccia",
-        description: "Herb focaccia with olive oil",
-        price: "GHC 18.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-    ],
-    "Ice Cream": [
-      {
-        id: 1,
-        name: "Vanilla Scoop",
-        description: "Classic vanilla ice cream with real vanilla beans",
-        price: "GHC 8.00",
+        id: 18,
+        name: "Double with milk",
+        description: "Milo, Nescafé, strawberry, Mocha, Cowbell, This Way, etc",
+        price: "GHC 19.00",
         image: "/placeholder.svg?height=100&width=150",
       },
       {
-        id: 2,
-        name: "Chocolate Fudge",
-        description: "Rich chocolate ice cream with fudge swirls",
-        price: "GHC 10.00",
+        id: 19,
+        name: "Lipton",
+        description: "Tea options",
+        price: "GHC 10.00 - 12.00",
         image: "/placeholder.svg?height=100&width=150",
       },
-      {
-        id: 3,
-        name: "Strawberry Delight",
-        description: "Fresh strawberry ice cream with fruit pieces",
-        price: "GHC 9.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 4,
-        name: "Mint Chocolate Chip",
-        description: "Cool mint ice cream with chocolate chips",
-        price: "GHC 11.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 5,
-        name: "Cookies & Cream",
-        description: "Vanilla ice cream with crushed cookie pieces",
-        price: "GHC 12.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 6,
-        name: "Caramel Swirl",
-        description: "Creamy caramel ice cream with caramel ribbons",
-        price: "GHC 13.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-    ],
+    ]
   }
 
-  const menuTabs = ["Panini", "Hot Dog", "Bread", "Ice Cream"]
+  const menuTabs = ["Paninis", "Hotdogs", "Beverages", "Hot Drinks"]
 
   // Search functionality
   const filteredItems: MenuItem[] = useMemo(() => {
