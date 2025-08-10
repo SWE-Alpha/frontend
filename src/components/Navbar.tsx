@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/app/cart-context";
 import {
   Bars3Icon,
@@ -11,17 +12,29 @@ import {
   ShoppingBagIcon,
   ShoppingCartIcon,
   BellIcon,
-  HeartIcon,
   Cog6ToothIcon,
   QuestionMarkCircleIcon,
-  ArrowRightOnRectangleIcon,
   HomeIcon,
-  UserGroupIcon,
 } from "@heroicons/react/24/outline";
+import AdminLoginModal from "./AdminLoginModal";
 
 const Navbar = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const { cartCount } = useCart();
+  const router = useRouter();
+
+  const handleAdminLogin = async (username: string, password: string) => {
+    // TODO: Implement actual authentication
+    // For now, just log in with any credentials
+    console.log('Logging in with:', { username });
+    // Store the auth state (in a real app, you'd use a proper auth context)
+    localStorage.setItem('isAdminAuthenticated', 'true');
+    // Close the modal
+    setIsLoginModalOpen(false);
+    // Redirect to admin dashboard
+    router.push('/admin/dashboard');
+  };
 
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
@@ -118,18 +131,28 @@ const Navbar = () => {
               
               {/* Admin Login Button */}
               <li className={adminButton.className}>
-                <Link
-                  href={adminButton.href}
-                  className="flex items-center px-4 py-3 text-sm font-medium text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                <button
+                  onClick={() => {
+                    setIsDrawerOpen(false);
+                    setIsLoginModalOpen(true);
+                  }}
+                  className="w-full flex items-center px-4 py-3 text-sm font-medium text-orange-600 hover:bg-orange-50 rounded-lg transition-colors text-left"
                 >
                   <adminButton.icon className="w-5 h-5 mr-3" />
                   {adminButton.label}
-                </Link>
+                </button>
               </li>
             </ul>
           </nav>
         </div>
       </div>
+
+      {/* Admin Login Modal */}
+      <AdminLoginModal 
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLogin={handleAdminLogin}
+      />
     </>
   );
 };
