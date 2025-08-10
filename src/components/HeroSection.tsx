@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 
-const images = ["heroimg.png"];
+const images = ["/heroimg.png"];
 
 const HeroSection = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);

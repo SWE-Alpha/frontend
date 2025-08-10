@@ -1,68 +1,96 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { ArrowLeft, Menu, Star, Clock, Flame, Minus, Plus, ShoppingCart } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
-import { useCart } from "@/app/cart-context"
+import { useState } from "react";
+import {
+  ArrowLeft,
+  Menu,
+  Star,
+  Clock,
+  Flame,
+  Minus,
+  Plus,
+  ShoppingCart,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { useCart } from "@/app/cart-context";
 
 // If the UI components are not available, we'll create simple versions
-const SimpleSwitch = ({ checked, onChange }: { checked: boolean; onChange: (checked: boolean) => void }) => (
+const SimpleSwitch = ({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) => (
   <label className="relative inline-flex items-center cursor-pointer">
-    <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="sr-only peer" />
+    <input
+      type="checkbox"
+      checked={checked}
+      onChange={(e) => onChange(e.target.checked)}
+      className="sr-only peer"
+    />
     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
   </label>
 );
 
-const SimpleTextarea = (props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
-  <textarea 
+const SimpleTextarea = (
+  props: React.TextareaHTMLAttributes<HTMLTextAreaElement>
+) => (
+  <textarea
     {...props}
-    className={`min-h-[80px] w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${props.className || ''}`}
+    className={`min-h-[80px] w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent ${
+      props.className || ""
+    }`}
   />
 );
 
-export default function ProductDetailPage({ params }: { params: { id: string } }) {
-  const router = useRouter()
-  const { addToCart } = useCart()
-  const [quantity, setQuantity] = useState(1)
+export default function ProductDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const router = useRouter();
+  const { addToCart } = useCart();
+  const [quantity, setQuantity] = useState(1);
   const [addOns, setAddOns] = useState({
     friedEgg: false,
     cheese: false,
     vegetable: false,
-  })
-  const [note, setNote] = useState("")
+  });
+  const [note, setNote] = useState("");
 
-  const basePrice = 90.0
+  const basePrice = 90.0;
   const addOnPrices = {
     friedEgg: 5.0,
     cheese: 5.0,
     vegetable: 7.0,
-  }
+  };
 
   const totalAddOns = Object.entries(addOns).reduce((total, [key, enabled]) => {
     if (enabled) {
-      return total + addOnPrices[key as keyof typeof addOnPrices]
+      return total + addOnPrices[key as keyof typeof addOnPrices];
     }
-    return total
-  }, 0)
+    return total;
+  }, 0);
 
-  const totalPrice = (basePrice + totalAddOns) * quantity
+  const totalPrice = (basePrice + totalAddOns) * quantity;
 
-  const incrementQuantity = () => setQuantity((prev) => prev + 1)
-  const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1))
+  const incrementQuantity = () => setQuantity((prev) => prev + 1);
+  const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1));
 
   const toggleAddOn = (addOn: keyof typeof addOns) => {
-    setAddOns((prev) => ({ ...prev, [addOn]: !prev[addOn] }))
-  }
+    setAddOns((prev) => ({ ...prev, [addOn]: !prev[addOn] }));
+  };
 
   return (
     <div className="max-w-sm mx-auto bg-white min-h-screen">
       {/* Header */}
       <div className="relative">
         <div className="absolute top-4 left-4 z-10">
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <Button
+            variant="ghost"
+            size="sm"
             className="bg-white/80 backdrop-blur-sm rounded-full p-2 h-10 w-10"
             onClick={() => router.back()}
           >
@@ -70,7 +98,11 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           </Button>
         </div>
         <div className="absolute top-4 right-4 z-10">
-          <Button variant="ghost" size="sm" className="bg-white/80 backdrop-blur-sm rounded-full p-2 h-10 w-10">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="bg-white/80 backdrop-blur-sm rounded-full p-2 h-10 w-10"
+          >
             <Menu className="w-5 h-5 text-gray-700" />
           </Button>
         </div>
@@ -99,7 +131,9 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             >
               <Minus className="w-4 h-4" />
             </Button>
-            <span className="text-lg font-semibold min-w-[20px] text-center">{quantity}</span>
+            <span className="text-lg font-semibold min-w-[20px] text-center">
+              {quantity}
+            </span>
             <Button
               size="sm"
               className="rounded-full w-8 h-8 p-0 bg-orange-500 hover:bg-orange-600"
@@ -137,42 +171,46 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
         {/* Description */}
         <p className="text-sm text-gray-600 leading-relaxed mb-6">
-          Made with freshly scrambled eggs, melted cheese, and served on warm, crusty panini bread. Choose from
-          delicious add-ons like tomatoes, onions, spinach, or crispy bacon for the extra kick.
+          Made with freshly scrambled eggs, melted cheese, and served on warm,
+          crusty panini bread. Choose from delicious add-ons like tomatoes,
+          onions, spinach, or crispy bacon for the extra kick.
         </p>
 
         {/* Price */}
         <div className="mb-6">
-          <span className="text-3xl font-bold text-gray-900">GHC {totalPrice.toFixed(2)}</span>
+          <span className="text-3xl font-bold text-gray-900">
+            GHC {totalPrice.toFixed(2)}
+          </span>
         </div>
 
         {/* Add to Cart Button */}
-        <Button 
+        <Button
           className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 mb-6"
           onClick={() => {
             // Calculate add-ons total
-            const addOnsTotal = 
-              (addOns.friedEgg ? 5 : 0) + 
-              (addOns.cheese ? 5 : 0) + 
+            const addOnsTotal =
+              (addOns.friedEgg ? 5 : 0) +
+              (addOns.cheese ? 5 : 0) +
               (addOns.vegetable ? 7 : 0);
-            
+
             // Create cart item with all required properties
             const cartItem = {
               id: params.id,
               name: "Panini Sandwich",
               price: basePrice,
-              image: "/placeholder.svg?height=256&width=400&text=Grilled+Panini+Sandwich",
+              image:
+                "/placeholder.svg?height=256&width=400&text=Grilled+Panini+Sandwich",
               category: "Panini",
               addOns: {
                 friedEgg: addOns.friedEgg,
                 cheese: addOns.cheese,
                 vegetable: addOns.vegetable,
               },
-              note: note || '',
+              note: note || "",
               quantity: quantity,
-              itemTotal: (basePrice + addOnsTotal) * quantity
+              itemTotal: (basePrice + addOnsTotal) * quantity,
             };
-            
+
             addToCart(cartItem);
             router.push("/cart");
           }}
@@ -187,8 +225,18 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium">Fried Egg</span>
-                <span className="text-sm text-gray-500">GHC 5.00</span>
+                <span
+                  className="text-sm font-medium"
+                  onClick={() => toggleAddOn("friedEgg")}
+                >
+                  Fried Egg
+                </span>
+                <span
+                  className="text-sm text-gray-500"
+                  onClick={() => toggleAddOn("friedEgg")}
+                >
+                  GHC 5.00
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <SimpleSwitch
@@ -200,8 +248,18 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium">Cheese</span>
-                <span className="text-sm text-gray-500">GHC 5.00</span>
+                <span
+                  className="text-sm font-medium"
+                  onClick={() => toggleAddOn("cheese")}
+                >
+                  Cheese
+                </span>
+                <span
+                  className="text-sm text-gray-500"
+                  onClick={() => toggleAddOn("cheese")}
+                >
+                  GHC 5.00
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <SimpleSwitch
@@ -213,8 +271,18 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium">Vegetable</span>
-                <span className="text-sm text-gray-500">GHC 7.00</span>
+                <span
+                  className="text-sm font-medium"
+                  onClick={() => toggleAddOn("vegetable")}
+                >
+                  Vegetable
+                </span>
+                <span
+                  className="text-sm text-gray-500"
+                  onClick={() => toggleAddOn("vegetable")}
+                >
+                  GHC 7.00
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <SimpleSwitch
@@ -232,7 +300,9 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           <SimpleTextarea
             placeholder="Add any special instructions..."
             value={note}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNote(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              setNote(e.target.value)
+            }
           />
         </div>
 
@@ -250,5 +320,5 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         </div>
       </div>
     </div>
-  )
+  );
 }
