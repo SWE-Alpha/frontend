@@ -200,7 +200,7 @@ const FoodOrderingApp = () => {
     ]
   }
 
-  const menuTabs = ["Paninis", "Hotdogs", "Beverages", "Hot Drinks"]
+  const menuTabs = ["Paninis", "Hotdogs", "Juice", "Hot Drinks"]
 
   // Search functionality
   const filteredItems: MenuItem[] = useMemo(() => {
