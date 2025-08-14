@@ -5,17 +5,12 @@ import { ArrowLeft, Minus, Plus, Trash2, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "../cart-context"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 
 export default function CartPage() {
   const router = useRouter()
   const { cartItems, updateCartItem, removeFromCart, clearCart, cartTotal, cartCount } = useCart()
   const [showCheckout, setShowCheckout] = useState(false)
-
-  const addOnPrices = {
-    friedEgg: 5.0,
-    cheese: 5.0,
-    vegetable: 7.0,
-  }
 
   const updateQuantity = (id: string, newQuantity: number) => {
     if (newQuantity < 1) {
@@ -25,19 +20,7 @@ export default function CartPage() {
     }
   }
 
-  const toggleAddOn = (id: string, addOn: keyof typeof addOnPrices) => {
-    const item = cartItems.find((item) => item.id === id)
-    if (item) {
-      updateCartItem(id, {
-        addOns: {
-          ...item.addOns,
-          [addOn]: !item.addOns[addOn],
-        },
-      })
-    }
-  }
-
-  const getAddOnsList = (addOns: any) => {
+  const getAddOnsList = (addOns: { friedEgg: boolean; cheese: boolean; vegetable: boolean }) => {
     const activeAddOns = Object.entries(addOns)
       .filter(([_, enabled]) => enabled)
       .map(([key, _]) => {
@@ -109,11 +92,15 @@ export default function CartPage() {
               {cartItems.map((item) => (
                 <div key={item.id} className="bg-white border border-gray-200 rounded-lg p-4">
                   <div className="flex gap-3">
-                    <img
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.name}
-                      className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
-                    />
+                    <div className="relative w-16 h-16 flex-shrink-0">
+                      <Image
+                        src={item.image || "/placeholder.svg"}
+                        alt={item.name}
+                        fill
+                        className="object-cover rounded-lg"
+                        sizes="64px"
+                      />
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between mb-2">
                         <div>

@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Clock, CheckCircle, Truck, Package, AlertCircle } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
 interface Order {
   id: string;
@@ -117,7 +116,7 @@ export default function AdminDashboard() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
         <p className="mt-1 text-sm text-gray-600">
-          Welcome back! Here's what's happening with your store today.
+          Welcome back! Here&apos;s what&apos;s happening with your store today.
         </p>
       </div>
 

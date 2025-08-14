@@ -1,9 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
 import {
-  ArrowLeft,
   Search,
   MoreHorizontal,
   Eye,
@@ -59,49 +57,74 @@ export default function OrderManagement() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
 
-  // Mock orders data
-  const mockOrders: Order[] = [
-    {
-      id: "1",
-      orderNumber: "ORD-001",
-      customerName: "John Doe",
-      customerPhone: "+233 24 123 4567",
-      customerAddress: "123 Main St, Accra",
-      items: [
-        {
-          id: "1",
-          name: "Cherry Dog",
-          quantity: 2,
-          price: 20.0,
-          addOns: ["Cheese", "Fried Egg"],
-          note: "Extra spicy",
-        },
-        {
-          id: "2",
-          name: "Italian Panini",
-          quantity: 1,
-          price: 18.0,
-          addOns: ["Vegetable"],
-        },
-      ],
-      total: 65.0,
-      status: "preparing",
-      orderType: "delivery",
-      paymentMethod: "mobile-money",
-      paymentStatus: "paid",
-      orderTime: new Date().toISOString(),
-      estimatedDelivery: new Date(Date.now() + 3600000).toISOString(),
-      notes: "Please call when arriving",
-    },
-    // Add more mock orders as needed
-  ];
-
-  useEffect(() => {
-    // In a real app, fetch orders from your API
+  const loadOrders = useCallback(() => {
+    // Mock orders data
+    const mockOrders: Order[] = [
+      {
+        id: "1",
+        orderNumber: "ORD-001",
+        customerName: "John Doe",
+        customerPhone: "+233 24 123 4567",
+        customerAddress: "123 Main St, Accra",
+        items: [
+          {
+            id: "1",
+            name: "Cherry Dog",
+            quantity: 2,
+            price: 20.0,
+            addOns: ["Cheese", "Fried Egg"],
+            note: "Extra spicy",
+          },
+          {
+            id: "2",
+            name: "Italian Panini",
+            quantity: 1,
+            price: 15.0,
+            addOns: [],
+          },
+        ],
+        total: 55.0,
+        status: "pending",
+        orderType: "delivery",
+        paymentMethod: "cash",
+        paymentStatus: "pending",
+        orderTime: "2023-05-15T10:30:00",
+        estimatedDelivery: "2023-05-15T11:30:00",
+        notes: "Please call before delivery",
+      },
+      {
+        id: "2",
+        orderNumber: "ORD-002",
+        customerName: "Jane Smith",
+        customerPhone: "+233 20 987 6543",
+        customerAddress: "456 Oak Ave, Kumasi",
+        items: [
+          {
+            id: "3",
+            name: "Chicken Wings",
+            quantity: 1,
+            price: 18.0,
+            addOns: ["BBQ Sauce"],
+          },
+        ],
+        total: 18.0,
+        status: "confirmed",
+        orderType: "pickup",
+        paymentMethod: "card",
+        paymentStatus: "paid",
+        orderTime: "2023-05-15T11:15:00",
+        estimatedDelivery: "2023-05-15T11:45:00",
+      },
+      // Add more mock orders as needed
+    ];
+    
     setOrders(mockOrders);
   }, []);
+
+  useEffect(() => {
+    loadOrders();
+  }, [loadOrders]);
 
   const getStatusColor = (status: string) => {
     switch (status) {

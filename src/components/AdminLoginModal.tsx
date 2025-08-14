@@ -28,7 +28,7 @@ export default function AdminLoginModal({ isOpen, onClose, onLogin }: AdminLogin
     try {
       await onLogin(username, password);
       // onLogin will handle the navigation on success
-    } catch (err) {
+    } catch (_err) {
       setError('Invalid username or password');
     } finally {
       setIsLoading(false);

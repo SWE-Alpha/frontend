@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowLeft, Menu, Star, Clock, Flame, Minus, Plus } from "lucide-react"
+import { ArrowLeft, Star, Clock, Flame, Minus, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { useCart } from "@/app/cart-context"
+import Image from "next/image"
 
 interface MenuItem {
   id: number;
@@ -100,7 +101,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     vegetable: false,
   });
 
-  // Fetch product data when component mounts
+  // Fetch product data when component mounts or when params.id changes
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -116,7 +117,9 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       }
     };
 
-    fetchProduct();
+    if (params.id) {
+      fetchProduct();
+    }
   }, [params.id]);
 
   // Add-on prices
@@ -213,12 +216,21 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         </div>
 
         {/* Product Image */}
-        <div className="w-full h-64 overflow-hidden">
-          <img
-            src={product.image || "/placeholder.svg?height=300&width=400&text=Product+Image"}
-            alt={product.name}
-            className="w-full h-full object-cover"
-          />
+        <div className="relative w-full h-64 overflow-hidden">
+          {product.image ? (
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              priority
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+              <span className="text-gray-400">No image available</span>
+            </div>
+          )}
         </div>
       </div>
 

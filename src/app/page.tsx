@@ -263,7 +263,7 @@ const FoodOrderingApp = () => {
       {/* Today's Special Offer - Hide when searching */}
       {!searchQuery && (
         <div className="px-4 py-6 relative">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">Today's Special Offers</h2>
+          <h2 className="text-xl font-bold mb-4 text-gray-800">Today&apos;s Special Offers</h2>
           <div className="relative h-64 overflow-hidden rounded-xl">
             <div 
               className="flex transition-transform duration-500 ease-in-out"
@@ -345,7 +345,7 @@ const FoodOrderingApp = () => {
       {searchQuery && (
         <div className="px-4 mb-4">
           <h2 className="text-lg font-semibold">
-            Search Results for "{searchQuery}" ({filteredItems.length} items)
+            Search Results for &quot;{searchQuery}&quot; ({filteredItems.length} items)
           </h2>
         </div>
       )}
@@ -429,7 +429,7 @@ const FoodOrderingApp = () => {
           </div>
         ) : searchQuery ? (
           <div className="text-center py-8">
-            <p className="text-gray-500">No items found for "{searchQuery}"</p>
+            <p className="text-gray-500">No items found for &quot;{searchQuery}&quot;</p>
             <Button variant="outline" onClick={clearSearch} className="mt-2 bg-transparent">
               Clear Search
             </Button>
