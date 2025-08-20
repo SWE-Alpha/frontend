@@ -1,40 +1,43 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/app/cart-context";
 import {
   Bars3Icon,
   XMarkIcon,
-  UserIcon,
-  ShoppingBagIcon,
   ShoppingCartIcon,
-  BellIcon,
-  HeartIcon,
-  Cog6ToothIcon,
-  QuestionMarkCircleIcon,
-  ArrowRightOnRectangleIcon,
+  UserIcon,
   HomeIcon,
-  UserGroupIcon,
 } from "@heroicons/react/24/outline";
+import AdminLoginModal from "./AdminLoginModal";
 
 const Navbar = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const { cartCount } = useCart();
+  const router = useRouter();
+
+  const handleAdminLogin = async (username: string, _password: string) => {
+    // TODO: Implement actual authentication
+    // For now, just log in with any credentials
+    console.log('Logging in with:', { username });
+    // Store the auth state (in a real app, you'd use a proper auth context)
+    localStorage.setItem('isAdminAuthenticated', 'true');
+    // Close the modal
+    setIsLoginModalOpen(false);
+    // Redirect to admin dashboard
+    router.push('/admin');
+  };
 
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
 
   const navItems = [
-    { icon: HomeIcon, label: 'Home', active: true },
-    { icon: UserGroupIcon, label: 'About Us' },
-    { icon: ShoppingBagIcon, label: 'Our Menu' },
-    { icon: HeartIcon, label: 'Favorites' },
-    { icon: Cog6ToothIcon, label: 'Settings' },
-    { icon: QuestionMarkCircleIcon, label: 'Help & Support' },
-    { icon: ArrowRightOnRectangleIcon, label: 'Sign Out' },
+    { icon: HomeIcon, label: 'Home', href: '/' },
+    { icon: UserIcon, label: 'Admin Login', href: '/admin/login' },
   ];
 
   return (
@@ -51,9 +54,6 @@ const Navbar = () => {
         </div>
         
         <div className="flex items-center space-x-4">
-          <button className="p-1">
-            <BellIcon className="w-6 h-6 text-gray-700" />
-          </button>
           <Link href="/cart" className="relative">
             <ShoppingCartIcon className="w-6 h-6 text-gray-700" />
             {cartCount > 0 && (
@@ -98,21 +98,44 @@ const Navbar = () => {
           {/* Navigation Links */}
           <nav className="py-4">
             <ul className="space-y-1 px-3">
-              {navItems.map((item, index) => (
-                <li key={index}>
-                  <a 
-                    href="#" 
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium ${item.active ? 'bg-orange-50 text-orange-600' : 'text-gray-700 hover:bg-gray-50'}`}
-                  >
-                    <item.icon className={`w-5 h-5 ${item.active ? 'text-orange-500' : 'text-gray-400'}`} />
-                    <span>{item.label}</span>
-                  </a>
-                </li>
-              ))}
+              {navItems.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <li key={index}>
+                    {item.href === '/admin/login' ? (
+                      <button
+                        onClick={() => {
+                          setIsDrawerOpen(false);
+                          setIsLoginModalOpen(true);
+                        }}
+                        className="w-full flex items-center px-4 py-3 text-sm font-medium text-orange-600 hover:bg-orange-50 rounded-lg transition-colors text-left"
+                      >
+                        <Icon className="w-5 h-5 mr-3" />
+                        {item.label}
+                      </button>
+                    ) : (
+                      <Link
+                        href={item.href}
+                        className="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors text-gray-700 hover:bg-gray-50 w-full"
+                      >
+                        <Icon className="w-5 h-5 mr-3" />
+                        {item.label}
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </nav>
         </div>
       </div>
+
+      {/* Admin Login Modal */}
+      <AdminLoginModal 
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLogin={handleAdminLogin}
+      />
     </>
   );
 };
