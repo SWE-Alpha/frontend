@@ -9,6 +9,7 @@ interface AdminLoginModalProps {
   onLogin: (username: string, password: string) => void;
 }
 
+
 export default function AdminLoginModal({ isOpen, onClose, onLogin }: AdminLoginModalProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
