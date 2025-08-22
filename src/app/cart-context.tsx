@@ -132,7 +132,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           note: itemInput.note || '',
           itemTotal,
         };
-
+        
         return [...prevItems, newItem];
       } catch (err) {
         setError('Failed to add item to cart. Please try again.');
