@@ -37,7 +37,7 @@ export const CategoriesProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setLoading(true);
     try {
       console.log('Fetching Categories');
-      const res = await fetch(`https://backend-two-chi-43.vercel.app/api/categories`);
+      const res = await fetch(`https://backend-mmow.vercel.app/api/categories`);
       if (!res.ok) {
         const errorText = await res.text();
         console.error('Failed to fetch Categories:', errorText);
