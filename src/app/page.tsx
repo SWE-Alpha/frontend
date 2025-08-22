@@ -8,6 +8,9 @@ import { Input } from "@/components/ui/input"
 import { useCart } from "./cart-context"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { useCategories } from "@/contexts/categoryContext"
+import { Categories } from "@/data/mockData"
+import { useProducts } from "@/contexts/productContext"
 
 interface MenuItem {
   id: number;
@@ -19,7 +22,7 @@ interface MenuItem {
 }
 
 const FoodOrderingApp = () => {
-  const [activeTab, setActiveTab] = useState("Paninis")
+  const [activeTab, setActiveTab] = useState("Panini")
   const [searchQuery, setSearchQuery] = useState("")
 
   const specialOffers = [
@@ -44,6 +47,13 @@ const FoodOrderingApp = () => {
   ]
   
   const [currentSlide, setCurrentSlide] = useState(0)
+  const {categories, setCategories} = useCategories();
+  const {products, setProducts} = useProducts();
+
+  const categoryProducts = products.filter(product => product.category.name === activeTab);
+  console.log(`These are the products..${JSON.stringify(products)}`);
+  console.log(`These are the categories..${JSON.stringify(categories)}`);
+
   const { addToCart } = useCart()
   const router = useRouter()
   
@@ -199,8 +209,9 @@ const FoodOrderingApp = () => {
       },
     ]
   }
-
-  const menuTabs = ["Paninis", "Hotdogs", "Beverages", "Hot Drinks"]
+  const catData = JSON.stringify(categories);
+  const menuTabs = JSON.parse(catData) as Categories[];
+  console.log(`Menu tabs: ${menuTabs}`);
 
   // Search functionality
   const filteredItems: MenuItem[] = useMemo(() => {
@@ -325,16 +336,16 @@ const FoodOrderingApp = () => {
           <div className="flex gap-2 overflow-x-auto pb-2">
             {menuTabs.map((tab) => (
               <Button
-                key={tab}
-                variant={activeTab === tab ? "default" : "outline"}
+                key={tab.id}
+                variant={activeTab === tab.name ? "default" : "outline"}
                 className={`rounded-full px-6 flex-shrink-0 ${
-                  activeTab === tab
+                  activeTab === tab.name
                     ? "bg-orange-500 hover:bg-orange-600 text-white"
                     : "border-gray-300 text-gray-600 hover:bg-gray-50"
                 }`}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => setActiveTab(tab.name)}
               >
-                {tab}
+                {tab.name}
               </Button>
             ))}
           </div>
@@ -352,18 +363,18 @@ const FoodOrderingApp = () => {
 
       {/* Products Grid */}
       <div className="px-4 pb-20">
-        {filteredItems.length > 0 ? (
+        {categoryProducts.length > 0 ? (
           <div className="grid grid-cols-2 gap-4">
-            {filteredItems.map((item) => (
+            {categoryProducts.map((item) => (
               <div 
                 key={item.id} 
                 className="block bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => router.push(`/products/${item.id}`)}
               >
                 <div className="relative w-full aspect-[4/3] bg-gray-100">
-                  {item.image ? (
+                  {item.images.length > 0 ? (
                     <Image
-                      src={item.image}
+                      src= ""
                       alt={item.name}
                       fill
                       className="object-cover"
@@ -385,7 +396,7 @@ const FoodOrderingApp = () => {
                 <div className="p-4">
                   <h3 className="font-semibold text-gray-900">{item.name}</h3>
                   {item.category && (
-                    <span className="text-xs text-orange-500 font-medium mb-1 block">{item.category}</span>
+                    <span className="text-xs text-orange-500 font-medium mb-1 block">{item.category.name}</span>
                   )}
                   <p className="text-xs text-gray-500 mb-2 line-clamp-2">{item.description}</p>
                   <div className="flex items-center justify-between">
@@ -397,15 +408,15 @@ const FoodOrderingApp = () => {
                         e.preventDefault();
                         e.stopPropagation();
                         // Extract numeric price from the price string (e.g., "GHC 12.00" -> 12.00)
-                        const price = parseFloat(item.price.replace(/[^0-9.]/g, ''));
-                        
+                        const price = item.price;
+
                         // Add to cart with default quantity of 1 and no add-ons
                         addToCart({
                           id: String(item.id),
                           name: item.name,
                           price: price,
-                          image: item.image,
-                          category: item.category || 'Other',
+                          image: item.images.length > 0 ? item.images[0].url : "/placeholder.svg",
+                          category: item.category.name || 'Other',
                           quantity: 1,
                           addOns: {
                             friedEgg: false,

@@ -5,6 +5,8 @@ import HeroSection from "@/components/HeroSection";
 import Navbar from "@/components/Navbar";
 import { CartProvider } from './cart-context';
 import { Toaster } from 'sonner';
+import { CategoriesProvider } from "@/contexts/categoryContext";
+import { ProductsProvider } from "@/contexts/productContext";
 
 export const metadata: Metadata = {
   title: "E-commerce Frontend",
@@ -19,17 +21,23 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col">
-        <CartProvider>
-          <div className="flex-grow">
-            <HeroSection />
-            <Navbar />
-            <main className="min-h-[calc(100vh-200px)]">
+        <CategoriesProvider>
+          <ProductsProvider>
+            <CartProvider>
+              <div className="flex-grow">
+                <HeroSection />
+                <Navbar />
+                <main className="min-h-[calc(100vh-200px)]">
               {children}
             </main>
           </div>
           <Footer className="mt-auto" />
           <Toaster position="top-center" />
         </CartProvider>
+
+         </ProductsProvider>
+
+        </CategoriesProvider>
       </body>
     </html>
   );
