@@ -61,7 +61,7 @@ export const ProductsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setLoading(true);
     try {
       console.log('Fetching Products');
-      const res = await fetch(`http://localhost:3001/api/products`);
+      const res = await fetch(`https://backend-two-chi-43.vercel.app/api/products`);
       if (!res.ok) {
         const errorText = await res.text();
         console.error('Failed to fetch Products:', errorText);
