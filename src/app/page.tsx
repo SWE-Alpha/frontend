@@ -374,7 +374,7 @@ const FoodOrderingApp = () => {
                 <div className="relative w-full aspect-[4/3] bg-gray-100">
                   {item.images.length > 0 ? (
                     <Image
-                      src= ""
+                      src={item.images[0].url}
                       alt={item.name}
                       fill
                       className="object-cover"
