@@ -1,16 +1,17 @@
-"use client"
+import type { Categories } from "@/contexts/categoryContext";
+//import type { useCategories } from "@/contexts/categoryContext";
+"use client";
 
-import React, { useState, useMemo, useEffect } from "react"
-import { Search, Plus, ChevronLeft, ChevronRight } from "lucide-react"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { useCart } from "./cart-context"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import { useCategories } from "@/contexts/categoryContext"
-import { Categories } from "@/data/mockData"
-import { useProducts } from "@/contexts/productContext"
+import React, { useState, useMemo, useEffect } from "react";
+import { Search, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useCart } from "./cart-context";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useCategories } from "@/contexts/categoryContext";
+import { useProducts } from "@/contexts/productContext";
 
 interface MenuItem {
   id: number;
@@ -22,49 +23,53 @@ interface MenuItem {
 }
 
 const FoodOrderingApp = () => {
-  const [activeTab, setActiveTab] = useState("Panini")
-  const [searchQuery, setSearchQuery] = useState("")
+  const [activeTab, setActiveTab] = useState("Panini");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const specialOffers = [
-    { 
-      id: 1, 
+    {
+      id: 1,
       title: "Special Offer 1",
       description: "Delicious meal combo",
-      image: "/placeholder.svg?height=200&width=320" 
+      image: "/placeholder.svg?height=200&width=320",
     },
-    { 
-      id: 2, 
+    {
+      id: 2,
       title: "Limited Time Deal",
       description: "Family meal package",
-      image: "/placeholder.svg?height=200&width=320" 
+      image: "/placeholder.svg?height=200&width=320",
     },
-    { 
-      id: 3, 
+    {
+      id: 3,
       title: "Weekend Special",
       description: "50% off on selected items",
-      image: "/placeholder.svg?height=200&width=320" 
+      image: "/placeholder.svg?height=200&width=320",
     },
-  ]
-  
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const {categories, setCategories} = useCategories();
-  const {products, setProducts} = useProducts();
+  ];
 
-  const categoryProducts = products.filter(product => product.category.name === activeTab);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const { categories, setCategories } = useCategories();
+  const { products, setProducts } = useProducts();
+
+  const categoryProducts = products.filter(
+    (product) => product.category.name === activeTab
+  );
   console.log(`These are the products..${JSON.stringify(products)}`);
   console.log(`These are the categories..${JSON.stringify(categories)}`);
 
-  const { addToCart } = useCart()
-  const router = useRouter()
-  
+  const { addToCart } = useCart();
+  const router = useRouter();
+
   // Auto-slide every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev === specialOffers.length - 1 ? 0 : prev + 1))
-    }, 5000)
-    
-    return () => clearInterval(interval)
-  }, [specialOffers.length])
+      setCurrentSlide((prev) =>
+        prev === specialOffers.length - 1 ? 0 : prev + 1
+      );
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [specialOffers.length]);
 
   const menuItems: Record<string, MenuItem[]> = {
     Paninis: [
@@ -136,7 +141,8 @@ const FoodOrderingApp = () => {
       {
         id: 10,
         name: "Buffalo Dog",
-        description: "Chilli sauce, mixed veg, mayo and chicken and minced meat",
+        description:
+          "Chilli sauce, mixed veg, mayo and chicken and minced meat",
         price: "GHC 50.00",
         image: "/placeholder.svg?height=100&width=150",
       },
@@ -207,8 +213,8 @@ const FoodOrderingApp = () => {
         price: "GHC 10.00 - 12.00",
         image: "/placeholder.svg?height=100&width=150",
       },
-    ]
-  }
+    ],
+  };
   const catData = JSON.stringify(categories);
   const menuTabs = JSON.parse(catData) as Categories[];
   console.log(`Menu tabs: ${menuTabs}`);
@@ -216,28 +222,28 @@ const FoodOrderingApp = () => {
   // Search functionality
   const filteredItems: MenuItem[] = useMemo(() => {
     if (!searchQuery.trim()) {
-      return menuItems[activeTab] || []
+      return menuItems[activeTab] || [];
     }
 
     // Search across all categories
     const allItems = Object.entries(menuItems).flatMap(([category, items]) =>
-      items.map((item) => ({ ...item, category })),
-    )
+      items.map((item) => ({ ...item, category }))
+    );
 
     return allItems.filter(
       (item) =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchQuery.toLowerCase()),
-    )
-  }, [searchQuery, activeTab])
+        item.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery, activeTab]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value)
-  }
+    setSearchQuery(e.target.value);
+  };
 
   const clearSearch = () => {
-    setSearchQuery("")
-  }
+    setSearchQuery("");
+  };
 
   return (
     <div className="w-full bg-white">
@@ -245,7 +251,9 @@ const FoodOrderingApp = () => {
       <div className="px-4 py-3 bg-orange-500">
         <div className="mb-3">
           <h1 className="text-xl font-bold text-white">Hi There!</h1>
-          <p className="text-sm text-white/90">What would you like to order today?</p>
+          <p className="text-sm text-white/90">
+            What would you like to order today?
+          </p>
         </div>
 
         <div className="flex gap-2">
@@ -274,9 +282,11 @@ const FoodOrderingApp = () => {
       {/* Today's Special Offer - Hide when searching */}
       {!searchQuery && (
         <div className="px-4 py-6 relative">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">Today&apos;s Special Offers</h2>
+          <h2 className="text-xl font-bold mb-4 text-gray-800">
+            Today&apos;s Special Offers
+          </h2>
           <div className="relative h-64 overflow-hidden rounded-xl">
-            <div 
+            <div
               className="flex transition-transform duration-500 ease-in-out"
               style={{ transform: `translateX(-${currentSlide * 100}%)` }}
             >
@@ -287,31 +297,41 @@ const FoodOrderingApp = () => {
                 >
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-orange-50 to-orange-100">
                     <div className="text-center p-6">
-                      <h3 className="text-2xl font-bold text-gray-800 mb-2">{offer.title}</h3>
+                      <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                        {offer.title}
+                      </h3>
                       <p className="text-gray-600 mb-4">{offer.description}</p>
-                      <Button className="bg-orange-500 hover:bg-orange-600">Order Now</Button>
+                      <Button className="bg-orange-500 hover:bg-orange-600">
+                        Order Now
+                      </Button>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-            
+
             {/* Navigation Arrows */}
-            <button 
-              onClick={() => setCurrentSlide(prev => prev === 0 ? specialOffers.length - 1 : prev - 1)}
+            <button
+              onClick={() =>
+                setCurrentSlide((prev) =>
+                  prev === 0 ? specialOffers.length - 1 : prev - 1
+                )
+              }
               className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg"
               aria-label="Previous slide"
             >
               <ChevronLeft className="w-6 h-6 text-orange-500" />
             </button>
-            <button 
-              onClick={() => setCurrentSlide(prev => (prev + 1) % specialOffers.length)}
+            <button
+              onClick={() =>
+                setCurrentSlide((prev) => (prev + 1) % specialOffers.length)
+              }
               className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg"
               aria-label="Next slide"
             >
               <ChevronRight className="w-6 h-6 text-orange-500" />
             </button>
-            
+
             {/* Dots Indicator */}
             <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
               {specialOffers.map((_, index) => (
@@ -319,7 +339,7 @@ const FoodOrderingApp = () => {
                   key={index}
                   onClick={() => setCurrentSlide(index)}
                   className={`w-2.5 h-2.5 rounded-full transition-all ${
-                    index === currentSlide ? 'bg-orange-500 w-6' : 'bg-gray-300'
+                    index === currentSlide ? "bg-orange-500 w-6" : "bg-gray-300"
                   }`}
                   aria-label={`Go to slide ${index + 1}`}
                 />
@@ -356,7 +376,8 @@ const FoodOrderingApp = () => {
       {searchQuery && (
         <div className="px-4 mb-4">
           <h2 className="text-lg font-semibold">
-            Search Results for &quot;{searchQuery}&quot; ({filteredItems.length} items)
+            Search Results for &quot;{searchQuery}&quot; ({filteredItems.length}{" "}
+            items)
           </h2>
         </div>
       )}
@@ -366,8 +387,8 @@ const FoodOrderingApp = () => {
         {categoryProducts.length > 0 ? (
           <div className="grid grid-cols-2 gap-4">
             {categoryProducts.map((item) => (
-              <div 
-                key={item.id} 
+              <div
+                key={item.id}
                 className="block bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => router.push(`/products/${item.id}`)}
               >
@@ -396,13 +417,17 @@ const FoodOrderingApp = () => {
                 <div className="p-4">
                   <h3 className="font-semibold text-gray-900">{item.name}</h3>
                   {item.category && (
-                    <span className="text-xs text-orange-500 font-medium mb-1 block">{item.category.name}</span>
+                    <span className="text-xs text-orange-500 font-medium mb-1 block">
+                      {item.category.name}
+                    </span>
                   )}
-                  <p className="text-xs text-gray-500 mb-2 line-clamp-2">{item.description}</p>
+                  <p className="text-xs text-gray-500 mb-2 line-clamp-2">
+                    {item.description}
+                  </p>
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-sm">{item.price}</span>
-                    <Button 
-                      size="sm" 
+                    <Button
+                      size="sm"
                       className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 h-7 text-xs"
                       onClick={(e) => {
                         e.preventDefault();
@@ -415,18 +440,21 @@ const FoodOrderingApp = () => {
                           id: String(item.id),
                           name: item.name,
                           price: price,
-                          image: item.images.length > 0 ? item.images[0].url : "/placeholder.svg",
-                          category: item.category.name || 'Other',
+                          image:
+                            item.images.length > 0
+                              ? item.images[0].url
+                              : "/placeholder.svg",
+                          category: item.category.name || "Other",
                           quantity: 1,
                           addOns: {
                             friedEgg: false,
                             cheese: false,
-                            vegetable: false
+                            vegetable: false,
                           },
                           note: "",
                           itemTotal: price,
                         });
-                        
+
                         toast.success(`${item.name} added to cart!`);
                       }}
                     >
@@ -440,23 +468,29 @@ const FoodOrderingApp = () => {
           </div>
         ) : searchQuery ? (
           <div className="text-center py-8">
-            <p className="text-gray-500">No items found for &quot;{searchQuery}&quot;</p>
-            <Button variant="outline" onClick={clearSearch} className="mt-2 bg-transparent">
+            <p className="text-gray-500">
+              No items found for &quot;{searchQuery}&quot;
+            </p>
+            <Button
+              variant="outline"
+              onClick={clearSearch}
+              className="mt-2 bg-transparent"
+            >
               Clear Search
             </Button>
           </div>
         ) : null}
       </div>
     </div>
-  )
-}
+  );
+};
 
 const Home = () => {
   return (
     <main className="min-h-screen bg-white">
       <FoodOrderingApp />
     </main>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
