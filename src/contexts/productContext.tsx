@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 // Products interface (adjust to match your actual Products structure)
-interface Products {
+export interface Products {
     id: string;
   name: string;
   description: string;

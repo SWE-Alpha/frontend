@@ -1,30 +1,20 @@
-import type { Categories } from "@/contexts/categoryContext";
-//import type { useCategories } from "@/contexts/categoryContext";
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
-import { Search, Plus, ChevronLeft, ChevronRight } from "lucide-react";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useCart } from "./cart-context";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { useCategories } from "@/contexts/categoryContext";
-import { useProducts } from "@/contexts/productContext";
-
-interface MenuItem {
-  id: number;
-  name: string;
-  description: string;
-  price: string;
-  image: string;
-  category?: string; // Optional since not all items have category
-}
+import React, { useState, useMemo, useEffect } from "react"
+import { Search, Plus, ChevronLeft, ChevronRight } from "lucide-react"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { useCart } from "./cart-context"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { useCategories } from "@/contexts/categoryContext"
+import { useProducts, Products } from "@/contexts/productContext"
+import { Categories } from "@/data/mockData"
 
 const FoodOrderingApp = () => {
-  const [activeTab, setActiveTab] = useState("Panini");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState<string>("")
+  const [searchQuery, setSearchQuery] = useState("")
 
   const specialOffers = [
     {
@@ -45,20 +35,20 @@ const FoodOrderingApp = () => {
       description: "50% off on selected items",
       image: "/placeholder.svg?height=200&width=320",
     },
-  ];
-
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const { categories, setCategories } = useCategories();
-  const { products, setProducts } = useProducts();
-
-  const categoryProducts = products.filter(
-    (product) => product.category.name === activeTab
-  );
-  console.log(`These are the products..${JSON.stringify(products)}`);
-  console.log(`These are the categories..${JSON.stringify(categories)}`);
-
-  const { addToCart } = useCart();
-  const router = useRouter();
+  ]
+  
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const { categories } = useCategories()
+  const { products } = useProducts()
+  const { addToCart } = useCart()
+  const router = useRouter()
+  
+  // Default active tab = first category
+  useEffect(() => {
+    if (categories.length > 0 && !activeTab) {
+      setActiveTab(categories[0].name)
+    }
+  }, [categories, activeTab])
 
   // Auto-slide every 5 seconds
   useEffect(() => {
@@ -71,171 +61,22 @@ const FoodOrderingApp = () => {
     return () => clearInterval(interval);
   }, [specialOffers.length]);
 
-  const menuItems: Record<string, MenuItem[]> = {
-    Paninis: [
-      {
-        id: 1,
-        name: "Layman",
-        description: "Egg, sausage, corn beef & Rose bread",
-        price: "GHC 18.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 2,
-        name: "Original",
-        description: "Eggs, sausage, corn beef & Big bread",
-        price: "GHC 25.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 3,
-        name: "Puff daddy",
-        description: "Eggs, sausages, corn beef, cheese & BB",
-        price: "GHC 33.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 4,
-        name: "Chairmoo",
-        description: "Eggs, sausages, corn beef, cheese & BB",
-        price: "GHC 38.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 5,
-        name: "Legend",
-        description: "Eggs, sausages, corn beef, cheese, chicken & BB",
-        price: "GHC 45.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-    ],
-    Hotdogs: [
-      {
-        id: 6,
-        name: "Cherry Dog",
-        description: "Relish, mustard, ketchup and raw onion",
-        price: "GHC 25.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 7,
-        name: "Chilli Dog",
-        description: "Chilli sauce, mozzarella cheese, onions",
-        price: "GHC 30.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 8,
-        name: "Slaw Dog",
-        description: "Cole slaw, sliced minced meat",
-        price: "GHC 35.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 9,
-        name: "Hoagie Dog",
-        description: "Chilli sauce, mixed veg mayo and chicken/ minced meat",
-        price: "GHC 40.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 10,
-        name: "Buffalo Dog",
-        description:
-          "Chilli sauce, mixed veg, mayo and chicken and minced meat",
-        price: "GHC 50.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-    ],
-    Beverages: [
-      {
-        id: 11,
-        name: "Yogurt juice",
-        description: "Refreshing yogurt drink",
-        price: "GHC 20.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 12,
-        name: "Mango juice",
-        description: "Fresh mango juice",
-        price: "GHC 20.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 13,
-        name: "Pineapple juice",
-        description: "Tropical pineapple juice",
-        price: "GHC 20.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 14,
-        name: "Millet juice",
-        description: "Traditional millet drink",
-        price: "GHC 20.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-    ],
-    "Hot Drinks": [
-      {
-        id: 15,
-        name: "Single",
-        description: "Milo, Nescafé, strawberry, Mocha, Cowbell, This Way, etc",
-        price: "GHC 10.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 16,
-        name: "Single with milk",
-        description: "Milo, Nescafé, strawberry, Mocha, Cowbell, This Way, etc",
-        price: "GHC 13.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 17,
-        name: "Double",
-        description: "Milo, Nescafé, strawberry, Mocha, Cowbell, This Way, etc",
-        price: "GHC 15.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 18,
-        name: "Double with milk",
-        description: "Milo, Nescafé, strawberry, Mocha, Cowbell, This Way, etc",
-        price: "GHC 19.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-      {
-        id: 19,
-        name: "Lipton",
-        description: "Tea options",
-        price: "GHC 10.00 - 12.00",
-        image: "/placeholder.svg?height=100&width=150",
-      },
-    ],
-  };
-  const catData = JSON.stringify(categories);
-  const menuTabs = JSON.parse(catData) as Categories[];
-  console.log(`Menu tabs: ${menuTabs}`);
+  // Filter by active tab
+  const categoryProducts: Products[] = useMemo(() => {
+    if (!activeTab) return []
+    return products.filter((product) => product.category?.name === activeTab)
+  }, [products, activeTab])
 
-  // Search functionality
-  const filteredItems: MenuItem[] = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return menuItems[activeTab] || [];
-    }
+  // Search across all products
+  const filteredItems: Products[] = useMemo(() => {
+    if (!searchQuery.trim()) return categoryProducts
 
-    // Search across all categories
-    const allItems = Object.entries(menuItems).flatMap(([category, items]) =>
-      items.map((item) => ({ ...item, category }))
-    );
-
-    return allItems.filter(
+    return products.filter(
       (item) =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [searchQuery, activeTab]);
+    )
+  }, [products, searchQuery, categoryProducts])
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -350,11 +191,11 @@ const FoodOrderingApp = () => {
       )}
 
       {/* Menu Tabs - Hide when searching */}
-      {!searchQuery && (
+      {!searchQuery && categories.length > 0 && (
         <div className="px-4 mb-4">
           <h2 className="text-lg font-semibold mb-3">Menu</h2>
           <div className="flex gap-2 overflow-x-auto pb-2">
-            {menuTabs.map((tab) => (
+            {categories.map((tab: Categories) => (
               <Button
                 key={tab.id}
                 variant={activeTab === tab.name ? "default" : "outline"}
@@ -384,11 +225,11 @@ const FoodOrderingApp = () => {
 
       {/* Products Grid */}
       <div className="px-4 pb-20">
-        {categoryProducts.length > 0 ? (
+        {filteredItems.length > 0 ? (
           <div className="grid grid-cols-2 gap-4">
-            {categoryProducts.map((item) => (
-              <div
-                key={item.id}
+            {filteredItems.map((item) => (
+              <div 
+                key={item.id} 
                 className="block bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => router.push(`/products/${item.id}`)}
               >
@@ -425,26 +266,21 @@ const FoodOrderingApp = () => {
                     {item.description}
                   </p>
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-sm">{item.price}</span>
-                    <Button
-                      size="sm"
+                    <span className="font-semibold text-sm">GHC {Number(item.price).toFixed(2)}</span>
+                    <Button 
+                      size="sm" 
                       className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 h-7 text-xs"
                       onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        // Extract numeric price from the price string (e.g., "GHC 12.00" -> 12.00)
-                        const price = item.price;
+                        e.preventDefault()
+                        e.stopPropagation()
+                        const price = item.price
 
-                        // Add to cart with default quantity of 1 and no add-ons
                         addToCart({
                           id: String(item.id),
                           name: item.name,
                           price: price,
-                          image:
-                            item.images.length > 0
-                              ? item.images[0].url
-                              : "/placeholder.svg",
-                          category: item.category.name || "Other",
+                          image: item.images.length > 0 ? item.images[0].url : "/placeholder.svg",
+                          category: item.category?.name || "Other",
                           quantity: 1,
                           addOns: {
                             friedEgg: false,
@@ -453,9 +289,9 @@ const FoodOrderingApp = () => {
                           },
                           note: "",
                           itemTotal: price,
-                        });
-
-                        toast.success(`${item.name} added to cart!`);
+                        })
+                        
+                        toast.success(`${item.name} added to cart!`)
                       }}
                     >
                       <Plus className="w-3 h-3 mr-1" />
