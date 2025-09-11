@@ -224,99 +224,105 @@ const FoodOrderingApp = () => {
       )}
 
       {/* Products Grid */}
-      <div className="px-4 pb-20">
-        {filteredItems.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4">
-            {filteredItems.map((item) => (
-              <div 
-                key={item.id} 
-                className="block bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => router.push(`/products/${item.id}`)}
-              >
-                <div className="relative w-full aspect-[4/3] bg-gray-100">
-                  {item.images.length > 0 ? (
+    <div className="px-4 pb-20">
+      {filteredItems.length > 0 ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+          {filteredItems.map((item) => (
+            <div 
+              key={item.id} 
+              className="block bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => router.push(`/products/${item.id}`)}
+            >
+              {/* Image */}
+              <div className="relative w-full aspect-[3/2] bg-gray-100">
+                {item.images.length > 0 ? (
+                  <Image
+                    src={item.images[0].url}
+                    alt={item.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 50vw, 33vw"
+                    priority
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
                     <Image
-                      src={item.images[0].url}
+                      src="/placeholder.svg"
                       alt={item.name}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 50vw, 33vw"
-                      priority
+                      width={100}
+                      height={100}
+                      className="opacity-30"
                     />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      <Image
-                        src="/placeholder.svg"
-                        alt={item.name}
-                        width={150}
-                        height={150}
-                        className="opacity-30"
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                  {item.category && (
-                    <span className="text-xs text-orange-500 font-medium mb-1 block">
-                      {item.category.name}
-                    </span>
-                  )}
-                  <p className="text-xs text-gray-500 mb-2 line-clamp-2">
-                    {item.description}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-sm">GHC {Number(item.price).toFixed(2)}</span>
-                    <Button 
-                      size="sm" 
-                      className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 h-7 text-xs"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        const price = item.price
-
-                        addToCart({
-                          id: String(item.id),
-                          name: item.name,
-                          price: price,
-                          image: item.images.length > 0 ? item.images[0].url : "/placeholder.svg",
-                          category: item.category?.name || "Other",
-                          quantity: 1,
-                          addOns: {
-                            friedEgg: false,
-                            cheese: false,
-                            vegetable: false,
-                          },
-                          note: "",
-                          itemTotal: price,
-                        })
-                        
-                        toast.success(`${item.name} added to cart!`)
-                      }}
-                    >
-                      <Plus className="w-3 h-3 mr-1" />
-                      Add
-                    </Button>
                   </div>
+                )}
+              </div>
+
+              {/* Details */}
+              <div className="p-3">
+                <h3 className="font-medium text-sm text-gray-900">{item.name}</h3>
+                {item.category && (
+                  <span className="text-[11px] text-orange-500 font-medium mb-1 block">
+                    {item.category.name}
+                  </span>
+                )}
+                <p className="text-[11px] text-gray-500 mb-2 line-clamp-2">
+                  {item.description}
+                </p>
+
+                {/* Price + Button */}
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-sm">
+                    GHC {Number(item.price).toFixed(2)}
+                  </span>
+                  <Button 
+                    size="sm" 
+                    className="bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 h-6 text-[11px]"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+
+                      const price = parseFloat(item.price.toString());
+
+                      
+                      addToCart({
+                      id: item.id.toString(),
+                      name: item.name,
+                      price: price,
+                      image: item.images?.[0]?.url || "/placeholder.svg",
+                      category: item.category?.name || "Other",
+                      addOns: { friedEgg: false, cheese: false, vegetable: false }, // default
+                      note: "",
+                      quantity: 1,
+                      itemTotal: price, // base price since quantity=1, no add-ons
+                    })
+                      
+                      toast.success(`${item.name} added to cart!`)
+                    }}
+                  >
+                    <Plus className="w-3 h-3 mr-1" />
+                    Add
+                  </Button>
                 </div>
               </div>
-            ))}
-          </div>
-        ) : searchQuery ? (
-          <div className="text-center py-8">
-            <p className="text-gray-500">
-              No items found for &quot;{searchQuery}&quot;
-            </p>
-            <Button
-              variant="outline"
-              onClick={clearSearch}
-              className="mt-2 bg-transparent"
-            >
-              Clear Search
-            </Button>
-          </div>
-        ) : null}
-      </div>
+            </div>
+          ))}
+        </div>
+      ) : searchQuery ? (
+        <div className="text-center py-8">
+          <p className="text-gray-500">
+            No items found for &quot;{searchQuery}&quot;
+          </p>
+          <Button
+            variant="outline"
+            onClick={clearSearch}
+            className="mt-2 bg-transparent"
+          >
+            Clear Search
+          </Button>
+        </div>
+      ) : null}
+    </div>
+
     </div>
   );
 };
