@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useCart } from "@/app/cart-context";
 import {
   Bars3Icon,
@@ -12,67 +11,97 @@ import {
   HomeIcon,
 } from "@heroicons/react/24/outline";
 import AdminLoginModal from "./AdminLoginModal";
+import Image from "next/image";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 
-const Navbar = () => {
+interface NavbarProps {
+  searchQuery: string;
+  handleSearch: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  clearSearch: () => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({
+  searchQuery,
+  handleSearch,
+  clearSearch,
+}) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  //const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const { cartCount } = useCart();
-  const router = useRouter();
-
-  const handleAdminLogin = async (username: string, _password: string) => {
-    // TODO: Implement actual authentication
-    // For now, just log in with any credentials
-    console.log('Logging in with:', { username });
-    // Store the auth state (in a real app, you'd use a proper auth context)
-    localStorage.setItem('isAdminAuthenticated', 'true');
-    // Close the modal
-    setIsLoginModalOpen(false);
-    // Redirect to admin dashboard
-    router.push('/admin');
-  };
 
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
 
-  const navItems = [
-    { icon: HomeIcon, label: 'Home', href: '/' },
-    { icon: UserIcon, label: 'Admin Login', href: '/admin/login' },
-  ];
+  const navItems = [{ icon: HomeIcon, label: "Home", href: "/" }];
 
   return (
     <>
       <nav className="flex justify-between items-center px-4 py-3 bg-white shadow-sm">
-        <button onClick={toggleDrawer} className="p-1">
-          <Bars3Icon className="w-6 h-6 text-gray-700" />
-        </button>
-        
-        <div className="absolute left-1/2 transform -translate-x-1/2">
-          <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
-            <UserIcon className="w-5 h-5 text-white" />
+        {/* Logo Left */}
+        <div className="flex items-center space-x-2">
+          <Image src="/logo.png" alt="Logo" width={40} height={40} />
+          <span className="font-bold text-orange-600 text-lg">Buddies Inn</span>
+        </div>
+
+        {/* Search Center */}
+        <div className="flex-1 max-w-lg mx-6">
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Input
+                placeholder="Search for food..."
+                className="bg-white border border-gray-300 rounded-lg pr-10"
+                value={searchQuery}
+                onChange={handleSearch}
+              />
+              {searchQuery && (
+                <button
+                  onClick={clearSearch}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+            <Button
+              size="sm"
+              className="bg-orange-600 hover:bg-orange-700 px-3"
+            >
+              <Search className="w-4 h-4" />
+            </Button>
           </div>
         </div>
-        
+
+        {/* Cart + Menu Right */}
         <div className="flex items-center space-x-4">
           <Link href="/cart" className="relative">
             <ShoppingCartIcon className="w-6 h-6 text-gray-700" />
             {cartCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {cartCount > 9 ? '9+' : cartCount}
+                {cartCount > 9 ? "9+" : cartCount}
               </span>
             )}
           </Link>
+          <button onClick={toggleDrawer} className="p-1">
+            <Bars3Icon className="w-6 h-6 text-gray-700" />
+          </button>
         </div>
       </nav>
 
-      {/* Sidebar Drawer */}
-      <div 
-        className={`fixed inset-0 z-50 transition-opacity duration-300 ${isDrawerOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+      {/* Sidebar Drawer (from right) */}
+      <div
+        className={`fixed inset-0 z-50 transition-opacity duration-300 ${
+          isDrawerOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
         onClick={toggleDrawer}
       >
-        <div 
-          className={`fixed left-0 top-0 h-full w-[280px] bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${isDrawerOpen ? 'translate-x-0' : '-translate-x-full'}`}
-          onClick={e => e.stopPropagation()}
+        <div
+          className={`fixed right-0 top-0 h-full w-[280px] bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+            isDrawerOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+          onClick={(e) => e.stopPropagation()}
         >
           {/* Drawer Header */}
           <div className="p-6 border-b border-gray-100">
@@ -106,7 +135,7 @@ const Navbar = () => {
                       <button
                         onClick={() => {
                           setIsDrawerOpen(false);
-                          setIsLoginModalOpen(true);
+                          //setIsLoginModalOpen(true);
                         }}
                         className="w-full flex items-center px-4 py-3 text-sm font-medium text-orange-600 hover:bg-orange-50 rounded-lg transition-colors text-left"
                       >
@@ -130,12 +159,12 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Admin Login Modal */}
-      <AdminLoginModal 
+      {/* Admin Login Modal (kept if needed later) */}
+      {/* <AdminLoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
-        onLogin={handleAdminLogin}
-      />
+        onLogin={() => {}}
+      /> */}
     </>
   );
 };

@@ -14,6 +14,11 @@ const nextConfig: NextConfig = {
         hostname: 'example.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'photos.google.com',
+        pathname: '/**'
+      }
     ],
   }
   }
