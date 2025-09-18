@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useCart } from "./cart-context";
@@ -11,6 +11,7 @@ import { useCategories } from "@/contexts/categoryContext";
 import { useProducts, Products } from "@/contexts/productContext";
 import { Categories } from "@/data/mockData";
 import Navbar from "@/components/Navbar";
+import { Input } from "@/components/ui/input";
 
 const FoodOrderingApp = () => {
   const [activeTab, setActiveTab] = useState<string>("");
@@ -68,14 +69,40 @@ const FoodOrderingApp = () => {
 
   return (
     <div className="w-full bg-white">
-      {/* Navbar now holds search bar */}
-      <Navbar
-        searchQuery={searchQuery}
-        handleSearch={handleSearch}
-        clearSearch={clearSearch}
-      />
 
-      {/* Special Offers */}
+{/* Search Bar */}
+      <div className="px-4 py-3 bg-orange-500">
+        <div className="mb-3">
+          <h1 className="text-xl font-bold text-white">Hi There!</h1>
+          <p className="text-sm text-white/90">
+            What would you like to order today?
+          </p>
+        </div>
+
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Input
+              placeholder="Search for food..."
+              className="bg-white border-0 rounded-lg pr-10"
+              value={searchQuery}
+              onChange={handleSearch}
+            />
+            {searchQuery && (
+              <button
+                onClick={clearSearch}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                ×
+              </button>
+            )}
+          </div>
+          <Button size="sm" className="bg-orange-600 hover:bg-orange-700 px-3">
+            <Search className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Today's Special Offer - Hide when searching */}
       {!searchQuery && (
         <div className="px-4 py-6 relative">
           <h2 className="text-xl font-bold mb-4 text-gray-800">

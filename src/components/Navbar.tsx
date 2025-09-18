@@ -16,19 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
-interface NavbarProps {
-  searchQuery: string;
-  handleSearch: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  clearSearch: () => void;
-}
-
-const Navbar: React.FC<NavbarProps> = ({
-  searchQuery,
-  handleSearch,
-  clearSearch,
-}) => {
+const Navbar: React.FC = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  //const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const { cartCount } = useCart();
 
   const toggleDrawer = () => {
@@ -43,36 +32,10 @@ const Navbar: React.FC<NavbarProps> = ({
         {/* Logo Left */}
         <div className="flex items-center space-x-2">
           <Image src="/logo.png" alt="Logo" width={40} height={40} />
-          <span className="font-bold text-orange-600 text-lg">Buddies Inn</span>
+          <span className="font-bold text-gray-800 text-lg">Buddies Inn</span>
         </div>
 
-        {/* Search Center */}
-        <div className="flex-1 max-w-lg mx-6">
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Input
-                placeholder="Search for food..."
-                className="bg-white border border-gray-300 rounded-lg pr-10"
-                value={searchQuery}
-                onChange={handleSearch}
-              />
-              {searchQuery && (
-                <button
-                  onClick={clearSearch}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  ×
-                </button>
-              )}
-            </div>
-            <Button
-              size="sm"
-              className="bg-orange-600 hover:bg-orange-700 px-3"
-            >
-              <Search className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
+        {/* (Search bar removed from here) */}
 
         {/* Cart + Menu Right */}
         <div className="flex items-center space-x-4">
