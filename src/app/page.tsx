@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import { useCategories } from "@/contexts/categoryContext";
 import { useProducts, Products } from "@/contexts/productContext";
 import { Categories } from "@/data/mockData";
-import Navbar from "@/components/Navbar";
 import { Input } from "@/components/ui/input";
 
 const FoodOrderingApp = () => {

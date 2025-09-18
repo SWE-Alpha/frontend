@@ -10,11 +10,8 @@ import {
   UserIcon,
   HomeIcon,
 } from "@heroicons/react/24/outline";
-import AdminLoginModal from "./AdminLoginModal";
+//import AdminLoginModal from "./AdminLoginModal";
 import Image from "next/image";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
 
 const Navbar: React.FC = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -35,7 +32,6 @@ const Navbar: React.FC = () => {
           <span className="font-bold text-gray-800 text-lg">Buddies Inn</span>
         </div>
 
-        {/* (Search bar removed from here) */}
 
         {/* Cart + Menu Right */}
         <div className="flex items-center space-x-4">
