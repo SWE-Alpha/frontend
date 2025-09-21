@@ -10,6 +10,7 @@ import Image from "next/image"
 import LoginModal from "@/components/LoginModal"
 import RegisterModal from "@/components/RegisterModal"
 
+
 export default function CartPage() {
   const router = useRouter()
   const { cartItems, updateCartItem, removeFromCart, clearCart, cartTotal, cartCount } = useCart()
