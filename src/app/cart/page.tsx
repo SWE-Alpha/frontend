@@ -4,13 +4,19 @@ import { useState } from "react"
 import { ArrowLeft, Minus, Plus, Trash2, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "../cart-context"
+import { useAuth } from "@/contexts/authContext"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
+import LoginModal from "@/components/LoginModal"
+import RegisterModal from "@/components/RegisterModal"
 
 export default function CartPage() {
   const router = useRouter()
   const { cartItems, updateCartItem, removeFromCart, clearCart, cartTotal, cartCount } = useCart()
+  const { user, isAuthenticated, login, register } = useAuth()
   const [showCheckout, setShowCheckout] = useState(false)
+  const [showLoginModal, setShowLoginModal] = useState(false)
+  const [showRegisterModal, setShowRegisterModal] = useState(false)
 
   const updateQuantity = (id: string, newQuantity: number) => {
     if (newQuantity < 1) {
@@ -39,6 +45,12 @@ export default function CartPage() {
   }
 
   const handleCheckout = () => {
+    // Check if user is authenticated before proceeding
+    if (!isAuthenticated) {
+      setShowLoginModal(true)
+      return
+    }
+
     setShowCheckout(true)
     // Simulate order processing
     setTimeout(() => {
@@ -47,6 +59,30 @@ export default function CartPage() {
       router.push("/")
       alert("Order placed successfully!")
     }, 2000)
+  }
+
+  const handleLogin = async (credentials: { number: string }) => {
+    await login(credentials)
+    setShowLoginModal(false)
+    // After successful login, proceed with checkout
+    handleCheckout()
+  }
+
+  const handleRegister = async (userData: { userName: string; number: string; address?: string }) => {
+    await register(userData)
+    setShowRegisterModal(false)
+    // After successful registration, proceed with checkout
+    handleCheckout()
+  }
+
+  const switchToRegister = () => {
+    setShowLoginModal(false)
+    setShowRegisterModal(true)
+  }
+
+  const switchToLogin = () => {
+    setShowRegisterModal(false)
+    setShowLoginModal(true)
   }
 
   return (
@@ -71,6 +107,12 @@ export default function CartPage() {
                 <h1 className="text-xl font-bold text-white">Your Cart</h1>
                 <p className="text-sm text-white/90">{cartCount} items</p>
               </div>
+              {isAuthenticated && (
+                <div className="text-right">
+                  <p className="text-sm text-white/90">Welcome back,</p>
+                  <p className="text-sm font-medium text-white">{user?.userName}</p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -178,7 +220,7 @@ export default function CartPage() {
                 className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3"
                 onClick={handleCheckout}
               >
-                Checkout - GHC {(cartTotal + 7).toFixed(2)}
+                {isAuthenticated ? `Checkout - GHC ${(cartTotal + 7).toFixed(2)}` : 'Sign in to Checkout'}
               </Button>
               <Button
                 variant="outline"
@@ -193,6 +235,22 @@ export default function CartPage() {
           </div>
         </>
       )}
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onLogin={handleLogin}
+        onSwitchToRegister={switchToRegister}
+      />
+
+      {/* Register Modal */}
+      <RegisterModal
+        isOpen={showRegisterModal}
+        onClose={() => setShowRegisterModal(false)}
+        onRegister={handleRegister}
+        onSwitchToLogin={switchToLogin}
+      />
     </div>
   );
 }

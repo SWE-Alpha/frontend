@@ -5,16 +5,36 @@ import { Plus, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useCart } from "./cart-context";
+import { useAuth } from "@/contexts/authContext";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useCategories } from "@/contexts/categoryContext";
 import { useProducts, Products } from "@/contexts/productContext";
 import { Categories } from "@/data/mockData";
 import { Input } from "@/components/ui/input";
+import LoginModal from "@/components/LoginModal";
+import RegisterModal from "@/components/RegisterModal";
 
 const FoodOrderingApp = () => {
   const [activeTab, setActiveTab] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [pendingCartItem, setPendingCartItem] = useState<{
+    id: string;
+    name: string;
+    price: number;
+    image: string;
+    category: string;
+    addOns: {
+      friedEgg: boolean;
+      cheese: boolean;
+      vegetable: boolean;
+    };
+    note: string;
+    quantity: number;
+    itemTotal: number;
+  } | null>(null);
 
   const specialOffers = [
     { id: 1, title: "Special Offer 1", description: "Delicious meal combo" },
@@ -26,6 +46,7 @@ const FoodOrderingApp = () => {
   const { categories } = useCategories();
   const { products } = useProducts();
   const { addToCart } = useCart();
+  const { isAuthenticated, login, register } = useAuth();
   const router = useRouter();
 
   // Default active tab = first category
@@ -34,6 +55,83 @@ const FoodOrderingApp = () => {
       setActiveTab(categories[0].name);
     }
   }, [categories, activeTab]);
+
+  // Authentication handlers
+  const handleLogin = async (credentials: { number: string }) => {
+    await login(credentials);
+    setShowLoginModal(false);
+    // Add the pending item to cart after successful login
+    if (pendingCartItem) {
+      addToCart(pendingCartItem);
+      toast.success(`${pendingCartItem.name} added to cart!`);
+      setPendingCartItem(null);
+    }
+  };
+
+  const handleRegister = async (userData: { userName: string; number: string; address?: string }) => {
+    await register(userData);
+    setShowRegisterModal(false);
+    // Add the pending item to cart after successful registration
+    if (pendingCartItem) {
+      addToCart(pendingCartItem);
+      toast.success(`${pendingCartItem.name} added to cart!`);
+      setPendingCartItem(null);
+    }
+  };
+
+  const switchToRegister = () => {
+    setShowLoginModal(false);
+    setShowRegisterModal(true);
+  };
+
+  const switchToLogin = () => {
+    setShowRegisterModal(false);
+    setShowLoginModal(true);
+  };
+
+  const handleAddToCart = (item: Products) => {
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      // Store the item to be added after authentication
+      const cartItem = {
+        id: item.id.toString(),
+        name: item.name,
+        price: parseFloat(item.price.toString()),
+        image: item.images?.[0]?.url || "/placeholder.svg",
+        category: item.category?.name || "Other",
+        addOns: {
+          friedEgg: false,
+          cheese: false,
+          vegetable: false,
+        },
+        note: "",
+        quantity: 1,
+        itemTotal: parseFloat(item.price.toString()),
+      };
+      setPendingCartItem(cartItem);
+      setShowLoginModal(true);
+      return;
+    }
+
+    // User is authenticated, add to cart directly
+    const price = parseFloat(item.price.toString());
+    addToCart({
+      id: item.id.toString(),
+      name: item.name,
+      price: price,
+      image: item.images?.[0]?.url || "/placeholder.svg",
+      category: item.category?.name || "Other",
+      addOns: {
+        friedEgg: false,
+        cheese: false,
+        vegetable: false,
+      },
+      note: "",
+      quantity: 1,
+      itemTotal: price,
+    });
+    toast.success(`${item.name} added to cart!`);
+  };
 
   // Auto-slide
   useEffect(() => {
@@ -249,23 +347,7 @@ const FoodOrderingApp = () => {
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        const price = parseFloat(item.price.toString());
-                        addToCart({
-                          id: item.id.toString(),
-                          name: item.name,
-                          price: price,
-                          image: item.images?.[0]?.url || "/placeholder.svg",
-                          category: item.category?.name || "Other",
-                          addOns: {
-                            friedEgg: false,
-                            cheese: false,
-                            vegetable: false,
-                          },
-                          note: "",
-                          quantity: 1,
-                          itemTotal: price,
-                        });
-                        toast.success(`${item.name} added to cart!`);
+                        handleAddToCart(item);
                       }}
                     >
                       <Plus className="w-3 h-3 mr-1" />
@@ -291,6 +373,20 @@ const FoodOrderingApp = () => {
           </div>
         ) : null}
       </div>
+
+      {/* Authentication Modals */}
+      <LoginModal 
+        isOpen={showLoginModal} 
+        onClose={() => setShowLoginModal(false)}
+        onLogin={handleLogin}
+        onSwitchToRegister={switchToRegister}
+      />
+      <RegisterModal 
+        isOpen={showRegisterModal} 
+        onClose={() => setShowRegisterModal(false)}
+        onRegister={handleRegister}
+        onSwitchToLogin={switchToLogin}
+      />
     </div>
   );
 };

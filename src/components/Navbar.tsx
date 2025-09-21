@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/app/cart-context";
+import { useAuth } from "@/contexts/authContext";
 import {
   Bars3Icon,
   XMarkIcon,
@@ -10,15 +11,39 @@ import {
   UserIcon,
   HomeIcon,
 } from "@heroicons/react/24/outline";
-//import AdminLoginModal from "./AdminLoginModal";
+import LoginModal from "./LoginModal";
+import RegisterModal from "./RegisterModal";
 import Image from "next/image";
 
 const Navbar: React.FC = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
   const { cartCount } = useCart();
+  const { user, isAuthenticated, login, register, logout } = useAuth();
 
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
+  };
+
+  const handleLogin = async (credentials: { number: string }) => {
+    await login(credentials);
+    setShowLoginModal(false);
+  };
+
+  const handleRegister = async (userData: { userName: string; number: string; address?: string }) => {
+    await register(userData);
+    setShowRegisterModal(false);
+  };
+
+  const switchToRegister = () => {
+    setShowLoginModal(false);
+    setShowRegisterModal(true);
+  };
+
+  const switchToLogin = () => {
+    setShowRegisterModal(false);
+    setShowLoginModal(true);
   };
 
   const navItems = [{ icon: HomeIcon, label: "Home", href: "/" }];
@@ -43,7 +68,7 @@ const Navbar: React.FC = () => {
               </span>
             )}
           </Link>
-          <button onClick={toggleDrawer} className="p-1">
+          <button onClick={toggleDrawer} className="p-1" aria-label="Open menu">
             <Bars3Icon className="w-6 h-6 text-gray-700" />
           </button>
         </div>
@@ -118,12 +143,20 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Admin Login Modal (kept if needed later) */}
-      {/* <AdminLoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        onLogin={() => {}}
-      /> */}
+      {/* Authentication Modals */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onLogin={handleLogin}
+        onSwitchToRegister={switchToRegister}
+      />
+
+      <RegisterModal
+        isOpen={showRegisterModal}
+        onClose={() => setShowRegisterModal(false)}
+        onRegister={handleRegister}
+        onSwitchToLogin={switchToLogin}
+      />
     </>
   );
 };
