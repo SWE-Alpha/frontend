@@ -7,11 +7,13 @@ interface User {
   userName: string;
   number: string;
   address?: string;
+  isAdmin?: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   isLoading: boolean;
   login: (credentials: { number: string }) => Promise<void>;
   register: (userData: { userName: string; number: string; address?: string }) => Promise<void>;
@@ -21,6 +23,9 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-two-chi-43.vercel.app';
+
+// Admin phone number constant
+const ADMIN_PHONE_NUMBER = '0534686069';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -47,7 +52,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
-        setUser(data.data);
+        const userWithAdminFlag = {
+          ...data.data,
+          isAdmin: data.data.number === ADMIN_PHONE_NUMBER
+        };
+        setUser(userWithAdminFlag);
       } else {
 
         localStorage.removeItem('authToken');
@@ -87,8 +96,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (data.success && data.data) {
         const { token, user: userData } = data.data;
+        
+        // Check if user is admin based on phone number
+        const userWithAdminFlag = {
+          ...userData,
+          isAdmin: userData.number === ADMIN_PHONE_NUMBER
+        };
+        
         localStorage.setItem('authToken', token);
-        setUser(userData);
+        setUser(userWithAdminFlag);
       } else {
         throw new Error(data.error || data.message || 'Login failed');
       }
@@ -132,8 +148,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (data.success && data.data) {
         const { token, user: newUser } = data.data;
+        
+        // Check if user is admin based on phone number
+        const userWithAdminFlag = {
+          ...newUser,
+          isAdmin: newUser.number === ADMIN_PHONE_NUMBER
+        };
+        
         localStorage.setItem('authToken', token);
-        setUser(newUser);
+        setUser(userWithAdminFlag);
       } else {
         throw new Error(data.error || data.message || 'Registration failed');
       }
@@ -154,6 +177,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = {
     user,
     isAuthenticated: !!user,
+    isAdmin: !!user?.isAdmin,
     isLoading,
     login,
     register,

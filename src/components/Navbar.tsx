@@ -10,6 +10,8 @@ import {
   ShoppingCartIcon,
   UserIcon,
   HomeIcon,
+  ArrowRightOnRectangleIcon,
+  Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
 import LoginModal from "./LoginModal";
 import RegisterModal from "./RegisterModal";
@@ -20,7 +22,7 @@ const Navbar: React.FC = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const { cartCount } = useCart();
-  const { user, isAuthenticated, login, register, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, login, register, logout } = useAuth();
 
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
@@ -95,8 +97,12 @@ const Navbar: React.FC = () => {
                   <UserIcon className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Buddies Inn</h2>
-                  <p className="text-sm text-gray-500">Welcome back!</p>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    {isAuthenticated ? user?.userName || 'User' : 'Buddies Inn'}
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    {isAuthenticated ? (isAdmin ? 'Admin User' : 'Welcome back!') : 'Please sign in'}
+                  </p>
                 </div>
               </div>
               <button 
@@ -115,29 +121,69 @@ const Navbar: React.FC = () => {
                 const Icon = item.icon;
                 return (
                   <li key={index}>
-                    {item.href === '/admin/login' ? (
-                      <button
-                        onClick={() => {
-                          setIsDrawerOpen(false);
-                          //setIsLoginModalOpen(true);
-                        }}
-                        className="w-full flex items-center px-4 py-3 text-sm font-medium text-orange-600 hover:bg-orange-50 rounded-lg transition-colors text-left"
-                      >
-                        <Icon className="w-5 h-5 mr-3" />
-                        {item.label}
-                      </button>
-                    ) : (
-                      <Link
-                        href={item.href}
-                        className="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors text-gray-700 hover:bg-gray-50 w-full"
-                      >
-                        <Icon className="w-5 h-5 mr-3" />
-                        {item.label}
-                      </Link>
-                    )}
+                    <Link
+                      href={item.href}
+                      className="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors text-gray-700 hover:bg-gray-50 w-full"
+                      onClick={() => setIsDrawerOpen(false)}
+                    >
+                      <Icon className="w-5 h-5 mr-3" />
+                      {item.label}
+                    </Link>
                   </li>
                 );
               })}
+              
+              {/* Authentication Section */}
+              <li className="border-t border-gray-200 pt-3 mt-3">
+                {!isAuthenticated ? (
+                  <>
+                    <button
+                      onClick={() => {
+                        setIsDrawerOpen(false);
+                        setShowLoginModal(true);
+                      }}
+                      className="w-full flex items-center px-4 py-3 text-sm font-medium text-orange-600 hover:bg-orange-50 rounded-lg transition-colors text-left"
+                    >
+                      <ArrowRightOnRectangleIcon className="w-5 h-5 mr-3" />
+                      Sign In
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsDrawerOpen(false);
+                        setShowRegisterModal(true);
+                      }}
+                      className="w-full flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors text-left mt-1"
+                    >
+                      <UserIcon className="w-5 h-5 mr-3" />
+                      Register
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    {/* Show admin dashboard link for admin users */}
+                    {isAdmin && (
+                      <Link
+                        href="/admin"
+                        className="flex items-center px-4 py-3 text-sm font-medium text-orange-600 hover:bg-orange-50 rounded-lg transition-colors w-full mb-1"
+                        onClick={() => setIsDrawerOpen(false)}
+                      >
+                        <Cog6ToothIcon className="w-5 h-5 mr-3" />
+                        Admin Dashboard
+                      </Link>
+                    )}
+                    <button
+                      onClick={() => {
+                        logout();
+                        setIsDrawerOpen(false);
+                      }}
+                      className="w-full flex items-center px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors text-left"
+                    >
+                      <ArrowRightOnRectangleIcon className="w-5 h-5 mr-3" />
+                      Sign Out
+                    </button>
+                  </>
+                )}
+              </li>
             </ul>
           </nav>
         </div>

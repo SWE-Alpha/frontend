@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { ArrowRight, Clock, CheckCircle, Truck, Package, AlertCircle } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/contexts/authContext";
 
 interface Order {
   id: string;
@@ -24,17 +24,10 @@ export default function AdminDashboard() {
   });
   
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
-  const router = useRouter();
+  const { user } = useAuth();
 
-  // Mock data - in a real app, fetch from API
+  // Load dashboard data
   useEffect(() => {
-    // Check authentication
-    const isAuthenticated = localStorage.getItem('isAdminAuthenticated') === 'true';
-    if (!isAuthenticated) {
-      router.push('/');
-      return;
-    }
-
     // Simulate API call
     const loadData = () => {
       setStats({
@@ -74,7 +67,7 @@ export default function AdminDashboard() {
     };
 
     loadData();
-  }, [router]);
+  }, []);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -114,9 +107,11 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-6 p-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900">
+          Welcome, {user?.userName || 'Admin'}!
+        </h1>
         <p className="mt-1 text-sm text-gray-600">
-          Welcome back! Here&apos;s what&apos;s happening with your store today.
+          Here&apos;s what&apos;s happening with your store today.
         </p>
       </div>
 

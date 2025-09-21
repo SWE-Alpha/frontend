@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";
 import { Home, Package, Users, Settings, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/authContext";
 
 export default function AdminLayout({
   children,
@@ -11,19 +12,38 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const { isAuthenticated, isAdmin, logout, isLoading } = useAuth();
 
-  // Simple auth check - in a real app, use a proper auth context
+  // Admin authentication check
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem('isAdminAuthenticated') === 'true';
-    if (!isAuthenticated) {
-      router.push('/');
+    if (!isLoading) {
+      if (!isAuthenticated || !isAdmin) {
+        router.push('/');
+      }
     }
-  }, [router]);
+  }, [isAuthenticated, isAdmin, isLoading, router]);
 
   const handleLogout = () => {
-    localStorage.removeItem('isAdminAuthenticated');
+    logout();
     router.push('/');
   };
+
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-orange-500"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render admin layout if user is not authenticated or not admin
+  if (!isAuthenticated || !isAdmin) {
+    return null;
+  }
 
   return (
     <div className="flex h-screen bg-gray-100">

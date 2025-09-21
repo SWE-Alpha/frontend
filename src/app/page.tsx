@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { Plus, ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight, Search, Settings } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useCart } from "./cart-context";
@@ -46,8 +46,15 @@ const FoodOrderingApp = () => {
   const { categories } = useCategories();
   const { products } = useProducts();
   const { addToCart } = useCart();
-  const { isAuthenticated, login, register } = useAuth();
+  const { isAuthenticated, isAdmin, login, register } = useAuth();
   const router = useRouter();
+
+  // Redirect admin users to admin page
+  useEffect(() => {
+    if (isAuthenticated && isAdmin) {
+      router.push('/admin');
+    }
+  }, [isAuthenticated, isAdmin, router]);
 
   // Default active tab = first category
   useEffect(() => {
@@ -166,6 +173,19 @@ const FoodOrderingApp = () => {
 
   return (
     <div className="w-full bg-white">
+      {/* Admin Button - Only show for authenticated admin users */}
+      {isAuthenticated && isAdmin && (
+        <div className="absolute top-4 right-4 z-50">
+          <Button
+            onClick={() => router.push('/admin')}
+            className="bg-orange-600 hover:bg-orange-700 text-white shadow-lg"
+            size="sm"
+          >
+            <Settings className="w-4 h-4 mr-2" />
+            Admin Dashboard
+          </Button>
+        </div>
+      )}
 
 {/* Search Bar */}
       <div className="px-4 py-3 bg-orange-500">
