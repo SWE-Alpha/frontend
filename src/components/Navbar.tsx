@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useCart } from "@/app/cart-context";
 import { useAuth } from "@/contexts/authContext";
@@ -22,6 +23,7 @@ const Navbar: React.FC = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const { cartCount } = useCart();
+  const pathname = usePathname();
   const { user, isAuthenticated, isAdmin, login, register, logout } = useAuth();
 
   const toggleDrawer = () => {
@@ -62,14 +64,17 @@ const Navbar: React.FC = () => {
 
         {/* Cart + Menu Right */}
         <div className="flex items-center space-x-4">
-          <Link href="/cart" className="relative">
-            <ShoppingCartIcon className="w-6 h-6 text-gray-700" />
-            {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {cartCount > 9 ? "9+" : cartCount}
-              </span>
-            )}
-          </Link>
+          {/* Hide cart icon on /admin routes */}
+          {!(pathname && pathname.startsWith("/admin")) && (
+            <Link href="/cart" className="relative">
+              <ShoppingCartIcon className="w-6 h-6 text-gray-700" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartCount > 9 ? "9+" : cartCount}
+                </span>
+              )}
+            </Link>
+          )}
           <button onClick={toggleDrawer} className="p-1" aria-label="Open menu">
             <Bars3Icon className="w-6 h-6 text-gray-700" />
           </button>
