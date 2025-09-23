@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowRight, Clock, CheckCircle, Truck, Package, AlertCircle } from "lucide-react";
+import {
+  ArrowRight,
+  Clock,
+  CheckCircle,
+  Truck,
+  Package,
+  AlertCircle,
+} from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/authContext";
 
@@ -22,7 +29,7 @@ export default function AdminDashboard() {
     ready: 0,
     outForDelivery: 0,
   });
-  
+
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const { user } = useAuth();
 
@@ -108,7 +115,7 @@ export default function AdminDashboard() {
     <div className="space-y-6 p-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
-          Welcome, {user?.userName || 'Admin'}!
+          Welcome, {user?.userName || "Admin"}!
         </h1>
         <p className="mt-1 text-sm text-gray-600">
           Here&apos;s what&apos;s happening with your store today.
@@ -124,8 +131,12 @@ export default function AdminDashboard() {
               <Package className="w-6 h-6" />
             </div>
             <div className="ml-5">
-              <p className="text-sm font-medium text-gray-500 truncate">Total Orders</p>
-              <p className="mt-1 text-3xl font-semibold text-gray-900">{stats.totalOrders}</p>
+              <p className="text-sm font-medium text-gray-500 truncate">
+                Total Orders
+              </p>
+              <p className="mt-1 text-3xl font-semibold text-gray-900">
+                {stats.totalOrders}
+              </p>
             </div>
           </div>
         </div>
@@ -137,8 +148,12 @@ export default function AdminDashboard() {
               <Clock className="w-6 h-6" />
             </div>
             <div className="ml-5">
-              <p className="text-sm font-medium text-gray-500 truncate">Pending</p>
-              <p className="mt-1 text-3xl font-semibold text-gray-900">{stats.pending}</p>
+              <p className="text-sm font-medium text-gray-500 truncate">
+                Pending
+              </p>
+              <p className="mt-1 text-3xl font-semibold text-gray-900">
+                {stats.pending}
+              </p>
             </div>
           </div>
         </div>
@@ -150,8 +165,12 @@ export default function AdminDashboard() {
               <Package className="w-6 h-6" />
             </div>
             <div className="ml-5">
-              <p className="text-sm font-medium text-gray-500 truncate">Preparing</p>
-              <p className="mt-1 text-3xl font-semibold text-gray-900">{stats.preparing}</p>
+              <p className="text-sm font-medium text-gray-500 truncate">
+                Preparing
+              </p>
+              <p className="mt-1 text-3xl font-semibold text-gray-900">
+                {stats.preparing}
+              </p>
             </div>
           </div>
         </div>
@@ -163,8 +182,12 @@ export default function AdminDashboard() {
               <CheckCircle className="w-6 h-6" />
             </div>
             <div className="ml-5">
-              <p className="text-sm font-medium text-gray-500 truncate">Ready</p>
-              <p className="mt-1 text-3xl font-semibold text-gray-900">{stats.ready}</p>
+              <p className="text-sm font-medium text-gray-500 truncate">
+                Ready
+              </p>
+              <p className="mt-1 text-3xl font-semibold text-gray-900">
+                {stats.ready}
+              </p>
             </div>
           </div>
         </div>
@@ -174,8 +197,8 @@ export default function AdminDashboard() {
       <div className="mt-8">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-medium text-gray-900">Recent Orders</h2>
-          <Link 
-            href="/admin/orders" 
+          <Link
+            href="/admin/orders"
             className="text-sm font-medium text-orange-600 hover:text-orange-500 flex items-center"
           >
             View all orders
@@ -186,19 +209,29 @@ export default function AdminDashboard() {
         <div className="mt-4 overflow-hidden bg-white shadow sm:rounded-md">
           <ul className="divide-y divide-gray-200">
             {recentOrders.map((order) => (
-              <li key={order.id} className="px-4 py-4 sm:px-6 hover:bg-gray-50 transition-colors">
+              <li
+                key={order.id}
+                className="px-4 py-4 sm:px-6 hover:bg-gray-50 transition-colors"
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="font-medium text-gray-900">
                       {order.orderNumber}
-                      <p className="text-sm text-gray-500">{order.customerName}</p>
+                      <p className="text-sm text-gray-500">
+                        {order.customerName}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
                     <div className="text-right">
-                      <p className="font-medium text-gray-900">GHS {order.total.toFixed(2)}</p>
+                      <p className="font-medium text-gray-900">
+                        GHS {order.total.toFixed(2)}
+                      </p>
                       <p className="text-sm text-gray-500">
-                        {new Date(order.orderTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(order.orderTime).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                       </p>
                     </div>
                     <div className="flex-shrink-0">
@@ -223,8 +256,12 @@ export default function AdminDashboard() {
             <div className="p-3 rounded-full bg-orange-50 text-orange-600">
               <Package className="w-6 h-6" />
             </div>
-            <h3 className="text-sm font-medium text-gray-900">Create New Order</h3>
-            <p className="text-sm text-gray-500">Manually create a new order for a customer</p>
+            <h3 className="text-sm font-medium text-gray-900">
+              Create New Order
+            </h3>
+            <p className="text-sm text-gray-500">
+              Manually create a new order for a customer
+            </p>
           </Link>
 
           <Link
@@ -248,7 +285,9 @@ export default function AdminDashboard() {
               </svg>
             </div>
             <h3 className="text-sm font-medium text-gray-900">Manage Menu</h3>
-            <p className="text-sm text-gray-500">Add, edit, or remove menu items</p>
+            <p className="text-sm text-gray-500">
+              Add, edit, or remove menu items
+            </p>
           </Link>
 
           <Link
@@ -271,7 +310,9 @@ export default function AdminDashboard() {
                 />
               </svg>
             </div>
-            <h3 className="text-sm font-medium text-gray-900">View Customers</h3>
+            <h3 className="text-sm font-medium text-gray-900">
+              View Customers
+            </h3>
             <p className="text-sm text-gray-500">Manage customer information</p>
           </Link>
 
@@ -296,7 +337,9 @@ export default function AdminDashboard() {
               </svg>
             </div>
             <h3 className="text-sm font-medium text-gray-900">View Reports</h3>
-            <p className="text-sm text-gray-500">Analyze sales and performance</p>
+            <p className="text-sm text-gray-500">
+              Analyze sales and performance
+            </p>
           </Link>
         </div>
       </div>

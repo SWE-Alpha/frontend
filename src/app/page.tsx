@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { Plus, ChevronLeft, ChevronRight, Search, Settings } from "lucide-react";
+import {
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  Settings,
+} from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useCart } from "./cart-context";
@@ -14,8 +20,29 @@ import { Categories } from "@/data/mockData";
 import { Input } from "@/components/ui/input";
 import LoginModal from "@/components/LoginModal";
 import RegisterModal from "@/components/RegisterModal";
+import Toast from "@/components/ui/toast";
 
 const FoodOrderingApp = () => {
+  const [showToast, setShowToast] = useState(false);
+  const [toastMsg, setToastMsg] = useState("");
+
+  // Show toast if message is present in localStorage after redirect
+  useEffect(() => {
+    const msg = window.localStorage.getItem("app_toast");
+    if (msg) {
+      setToastMsg(msg);
+      setShowToast(true);
+      window.localStorage.removeItem("app_toast");
+    }
+  }, []);
+
+  // Always auto-dismiss toast after 4 seconds when shown
+  useEffect(() => {
+    if (showToast) {
+      const timer = setTimeout(() => setShowToast(false), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [showToast]);
   const [activeTab, setActiveTab] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -39,7 +66,11 @@ const FoodOrderingApp = () => {
   const specialOffers = [
     { id: 1, title: "Special Offer 1", description: "Delicious meal combo" },
     { id: 2, title: "Limited Time Deal", description: "Family meal package" },
-    { id: 3, title: "Weekend Special", description: "50% off on selected items" },
+    {
+      id: 3,
+      title: "Weekend Special",
+      description: "50% off on selected items",
+    },
   ];
 
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -52,7 +83,7 @@ const FoodOrderingApp = () => {
   // Redirect admin users to admin page
   useEffect(() => {
     if (isAuthenticated && isAdmin) {
-      router.push('/admin');
+      router.push("/admin");
     }
   }, [isAuthenticated, isAdmin, router]);
 
@@ -75,7 +106,11 @@ const FoodOrderingApp = () => {
     }
   };
 
-  const handleRegister = async (userData: { userName: string; number: string; address?: string }) => {
+  const handleRegister = async (userData: {
+    userName: string;
+    number: string;
+    address?: string;
+  }) => {
     await register(userData);
     setShowRegisterModal(false);
     // Add the pending item to cart after successful registration
@@ -173,11 +208,16 @@ const FoodOrderingApp = () => {
 
   return (
     <div className="w-full bg-white">
+      <Toast
+        message={toastMsg}
+        show={showToast}
+        onClose={() => setShowToast(false)}
+      />
       {/* Admin Button - Only show for authenticated admin users */}
       {isAuthenticated && isAdmin && (
         <div className="absolute top-4 right-4 z-50">
           <Button
-            onClick={() => router.push('/admin')}
+            onClick={() => router.push("/admin")}
             className="bg-orange-600 hover:bg-orange-700 text-white shadow-lg"
             size="sm"
           >
@@ -187,7 +227,7 @@ const FoodOrderingApp = () => {
         </div>
       )}
 
-{/* Search Bar */}
+      {/* Search Bar */}
       <div className="px-4 py-3 bg-orange-500">
         <div className="mb-3">
           <h1 className="text-xl font-bold text-white">Hi There!</h1>
@@ -395,14 +435,14 @@ const FoodOrderingApp = () => {
       </div>
 
       {/* Authentication Modals */}
-      <LoginModal 
-        isOpen={showLoginModal} 
+      <LoginModal
+        isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
         onLogin={handleLogin}
         onSwitchToRegister={switchToRegister}
       />
-      <RegisterModal 
-        isOpen={showRegisterModal} 
+      <RegisterModal
+        isOpen={showRegisterModal}
         onClose={() => setShowRegisterModal(false)}
         onRegister={handleRegister}
         onSwitchToLogin={switchToLogin}
