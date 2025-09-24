@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Home, Package, Users, Settings, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/authContext";
 import { OrdersProvider } from "@/contexts/orderContext";
+import { ProductsProvider } from "@/contexts/productContext";
 
 export default function AdminLayout({
   children,
@@ -117,11 +118,13 @@ export default function AdminLayout({
         </header>
 
         {/* Page content */}
+        <ProductsProvider>
         <OrdersProvider>
           <main className="flex-1 overflow-y-auto p-4 md:p-6">
             {children}
           </main>
         </OrdersProvider>
+        </ProductsProvider>
       </div>
     </div>
   );
