@@ -1,6 +1,6 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useAuth } from "./authContext";
+//import { useAuth } from "./authContext";
 
 // Address interface (matches createOrder structure)
 export interface Address {
