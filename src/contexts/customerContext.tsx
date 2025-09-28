@@ -1,8 +1,16 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useAuth } from "./authContext";
 
-// Customer interface (matches user structure)
+// User interface matching backend schema
+export interface Customer {
+  id: string;
+  number: string;
+  userName: string;
+  phone: string;
+  role: 'CUSTOMER' | 'ADMIN' | 'SUPER_ADMIN';
+  isActive: boolean;
+  createdAt: string;
+}
 
 export interface CustomerResponse {
   success: boolean;
@@ -33,35 +41,37 @@ export const CustomersProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
 
   const fetchCustomers = async () => {
-  setLoading(true);
-  try {
-    console.log("Fetching Customers");
+    setLoading(true);
+    try {
+      console.log("Fetching Customers");
 
-    const res = await fetch(`https://backend-mmow.vercel.app/api/users`, {
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: token ? `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtZnVmNDV0cDAwMDBsNTA0ZGM5cTY3b2wiLCJpYXQiOjE3NTg1OTcxMTIsImV4cCI6MTc1OTIwMTkxMn0.5SYb57C4v2DO_5oSmZO1AUwAu9NRMMBX_ZLRyknXiEA` : "", //This token was used for testing purposes only
-  },
-});
+      const res = await fetch(`https://backend-mmow.vercel.app/api/users`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtZnVmNDV0cDAwMDBsNTA0ZGM5cTY3b2wiLCJpYXQiOjE3NTg1OTcxMTIsImV4cCI6MTc1OTIwMTkxMn0.5SYb57C4v2DO_5oSmZO1AUwAu9NRMMBX_ZLRyknXiEA` : "",
+        },
+      });
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error("Failed to fetch Orders:", errorText);
-      return;
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Failed to fetch Users:", errorText);
+        return;
+      }
+
+      const data = await res.json();
+      console.log("Fetched Customers:", data);
+      // Only keep customers with role CUSTOMER
+      const customersOnly = (data.data as Customer[]).filter(u => u.role === 'CUSTOMER');
+      setCustomers(customersOnly);
+    } catch (error) {
+      console.error("Error fetching Customers:", error);
+    } finally {
+      setLoading(false);
     }
-
-    const data = await res.json();
-    console.log("Fetched Customers:", data);
-    setCustomers(data.data);
-  } catch (error) {
-    console.error("Error fetching Customers:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   useEffect(() => {
-    fetchCustomers(); // consider passing token if required
+    fetchCustomers();
   }, []);
 
   return (
