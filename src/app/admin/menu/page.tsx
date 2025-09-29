@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Pencil, Trash2, Plus } from "lucide-react";
+import { Products, useProducts } from "@/contexts/productContext";
 
 interface MenuItem {
   id: string;
@@ -19,45 +20,28 @@ interface MenuItem {
   image: string;
 }
 
-const initialMenu: MenuItem[] = [
-  {
-    id: "1",
-    name: "Creamy Pasta",
-    description: "Delicious pasta with creamy sauce",
-    category: "Pasta",
-    price: 25,
-    image: "/public/crunch.jpg",
-  },
-  {
-    id: "2",
-    name: "Spicy Wings",
-    description: "Spicy chicken wings",
-    category: "Starters",
-    price: 18,
-    image: "/public/menuIcon.jpg",
-  },
-  {
-    id: "3",
-    name: "Fresh Bread",
-    description: "Freshly baked bread",
-    category: "Bakery",
-    price: 10,
-    image: "/public/heroimg.png",
-  },
-  {
-    id: "4",
-    name: "Lemonade",
-    description: "Refreshing lemonade",
-    category: "Drinks",
-    price: 8,
-    image: "/public/window.svg",
-  },
-];
+
 
 export default function ManageMenuPage() {
+
+
+  const { products } = useProducts();
+
+  // Map Products to MenuItem properties
+  const initialMenu: MenuItem[] = products.map((p) => ({
+    id: p.id,
+    name: p.name,
+    description: p.description,
+    category: typeof p.category === 'string' ? p.category : p.category?.name || "Other",
+    price: Number(p.price),
+    image: p.images?.[0]?.url || "/placeholder.svg",
+  }));
+
+
   const [menu, setMenu] = useState<MenuItem[]>(initialMenu);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editItem, setEditItem] = useState<MenuItem | null>(null);
+  const [editItem, setEditItem] = useState<Products | null>(null);
+  console.log(products);
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -72,17 +56,17 @@ export default function ManageMenuPage() {
     setDialogOpen(true);
   };
 
-  const openEditDialog = (item: MenuItem) => {
-    setEditItem(item);
-    setForm({
-      name: item.name,
-      description: item.description,
-      category: item.category,
-      price: item.price.toString(),
-      image: item.image,
-    });
-    setDialogOpen(true);
-  };
+  // const openEditDialog = (item: MenuItem) => {
+  //   setEditItem(item);
+  //   setForm({
+  //     name: item.name,
+  //     description: item.description,
+  //     category: item.category,
+  //     price: item.price.toString(),
+  //     image: item.image,
+  //   });
+  //   setDialogOpen(true);
+  // };
 
   const handleDelete = (id: string) => {
     setMenu(menu.filter((item) => item.id !== id));
@@ -144,7 +128,7 @@ export default function ManageMenuPage() {
               </div>
               <button
                 className="ml-2 text-orange-500 hover:text-orange-600"
-                onClick={() => openEditDialog(item)}
+               // onClick={() => openEditDialog(item)}
               >
                 <Pencil className="w-5 h-5" />
               </button>
