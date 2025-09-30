@@ -48,7 +48,7 @@ export const CustomersProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const res = await fetch(`https://backend-mmow.vercel.app/api/users`, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: token ? `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtZnVmNDV0cDAwMDBsNTA0ZGM5cTY3b2wiLCJpYXQiOjE3NTg1OTcxMTIsImV4cCI6MTc1OTIwMTkxMn0.5SYb57C4v2DO_5oSmZO1AUwAu9NRMMBX_ZLRyknXiEA` : "",
+          Authorization: token ? `Bearer ${token}` : "",
         },
       });
 
