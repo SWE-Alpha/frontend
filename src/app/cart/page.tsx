@@ -95,6 +95,10 @@ export default function CartPage() {
       // Sync local cart to backend before placing order
       await syncCartToBackend(cartItems, token);
 
+      // Debug: log user and user.userName
+      console.log("user object at checkout:", user);
+      console.log("user.userName at checkout:", user?.userName);
+
       const orderPayload: CreateOrderRequest = {
         orderNumber: `ORD-${Date.now()}`,
         customerName: user?.userName || "User",
@@ -122,6 +126,8 @@ export default function CartPage() {
       };
       const response = await createOrder(orderPayload, token);
       if (response.success) {
+        console.log("Username:", user?.userName);
+        console.log("Order created:", response.data);
         clearCart();
         setShowCheckout(false);
         setToastMsg("Order placed successfully!");
