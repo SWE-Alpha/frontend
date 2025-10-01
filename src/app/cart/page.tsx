@@ -7,10 +7,11 @@ import { useCart } from "../cart-context";
 import { useAuth } from "@/contexts/authContext";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-
 import Toast from "@/components/ui/toast";
 import LoginModal from "@/components/LoginModal";
 import RegisterModal from "@/components/RegisterModal";
+import { createOrder, CreateOrderRequest } from "@/lib/api";
+import { syncCartToBackend } from "@/lib/cartApi";
 
 export default function CartPage() {
   const router = useRouter();
@@ -28,6 +29,8 @@ export default function CartPage() {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
+
+  //const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
   const updateQuantity = (id: string, newQuantity: number) => {
     if (newQuantity < 1) {
@@ -59,23 +62,98 @@ export default function CartPage() {
     return activeAddOns.length > 0 ? activeAddOns.join(", ") : "No add-ons";
   };
 
-  const handleCheckout = () => {
-    // Check if user is authenticated before proceeding
+  // const handleCheckout = () => {
+  //   // Check if user is authenticated before proceeding
+  //   if (!isAuthenticated) {
+  //     setShowLoginModal(true);
+  //     return;
+  //   }
+
+  //   setShowCheckout(true);
+  //   // Simulate order processing
+  //   setTimeout(() => {
+  //     clearCart();
+  //     setShowCheckout(false);
+  //     // Store toast message in localStorage before redirect
+  //     window.localStorage.setItem("app_toast", "Order placed successfully!");
+  //     router.push("/");
+  //   }, 2000);
+  // };
+
+
+  // Checkout logic from app/page.tsx, using cart page's toaster
+  const handleCheckout = async () => {
     if (!isAuthenticated) {
       setShowLoginModal(true);
       return;
     }
-
     setShowCheckout(true);
-    // Simulate order processing
-    setTimeout(() => {
-      clearCart();
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error("No auth token found");
+
+      // Sync local cart to backend before placing order
+      await syncCartToBackend(cartItems, token);
+
+      // Debug: log user and user.userName
+      console.log("user object at checkout:", user);
+      console.log("user.userName at checkout:", user?.userName);
+
+      const orderPayload: CreateOrderRequest = {
+        orderNumber: `ORD-${Date.now()}`,
+        customerName: user?.userName || "User",
+        subtotal: cartTotal,
+        tax: 0,
+        shipping: 7,
+        discount: 0,
+        total: cartTotal + 7,
+        items: cartItems.map((item) => ({
+          productId: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          total: item.itemTotal,
+        })),
+        shippingAddress: {
+          firstName: "",
+          lastName: "",
+          address1: "",
+          city: "",
+          state: "",
+          zipCode: "",
+          country: "",
+        },
+      };
+      const response = await createOrder(orderPayload, token);
+      if (response.success) {
+        console.log("Username:", user?.userName);
+        console.log("Order created:", response.data);
+        clearCart();
+        setShowCheckout(false);
+        setToastMsg("Order placed successfully!");
+        setShowToast(true);
+        // Redirect
+        setTimeout(() => {
+          router.push("/");
+        }, 1500);
+        setShowToast(true);
+      } else {
+        throw new Error(response.message || "Order failed");
+      }
+    } catch (err) {
       setShowCheckout(false);
-      // Store toast message in localStorage before redirect
-      window.localStorage.setItem("app_toast", "Order placed successfully!");
-      router.push("/");
-    }, 2000);
+      let message = "Unknown error";
+      if (err instanceof Error) {
+        message = err.message;
+      }
+      setToastMsg("Order failed: " + message);
+      setShowToast(true);
+    }
   };
+
+  // end
+
+
 
   const handleLogin = async (credentials: { number: string }) => {
     await login(credentials);
@@ -112,6 +190,7 @@ export default function CartPage() {
         show={showToast}
         onClose={() => setShowToast(false)}
       />
+      
       {showCheckout ? (
         <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
           <div className="text-center p-6 max-w-sm w-full">

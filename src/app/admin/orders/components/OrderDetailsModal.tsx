@@ -98,9 +98,9 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                           )}
                         </div>
                         <div className="text-right">
-                          <p className="font-medium">GHS {item.price.toFixed(2)}</p>
+                          <p className="font-medium">GHS {Number(item.price).toFixed(2)}</p>
                           <p className="text-sm text-gray-600">
-                            Total: GHS {(item.price * item.quantity).toFixed(2)}
+                            Total: GHS {(Number(item.price) * item.quantity).toFixed(2)}
                           </p>
                         </div>
                       </div>

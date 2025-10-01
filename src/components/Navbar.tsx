@@ -54,7 +54,7 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className="flex justify-between items-center px-4 py-3 bg-white shadow-sm">
+      <nav className="flex justify-between items-center px-4 py-3 bg-gray-50 shadow-lg">
         {/* Logo Left */}
         <div className="flex items-center space-x-2">
           <Image src="/logo.png" alt="Logo" width={40} height={40} />
