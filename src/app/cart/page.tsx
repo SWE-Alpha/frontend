@@ -30,7 +30,6 @@ export default function CartPage() {
   const [showToast, setShowToast] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
 
-  //const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
   const updateQuantity = (id: string, newQuantity: number) => {
     if (newQuantity < 1) {
@@ -62,26 +61,8 @@ export default function CartPage() {
     return activeAddOns.length > 0 ? activeAddOns.join(", ") : "No add-ons";
   };
 
-  // const handleCheckout = () => {
-  //   // Check if user is authenticated before proceeding
-  //   if (!isAuthenticated) {
-  //     setShowLoginModal(true);
-  //     return;
-  //   }
 
-  //   setShowCheckout(true);
-  //   // Simulate order processing
-  //   setTimeout(() => {
-  //     clearCart();
-  //     setShowCheckout(false);
-  //     // Store toast message in localStorage before redirect
-  //     window.localStorage.setItem("app_toast", "Order placed successfully!");
-  //     router.push("/");
-  //   }, 2000);
-  // };
-
-
-  // Checkout logic from app/page.tsx, using cart page's toaster
+  // Checkout logic with backend integration
   const handleCheckout = async () => {
     if (!isAuthenticated) {
       setShowLoginModal(true);
@@ -115,13 +96,13 @@ export default function CartPage() {
           total: item.itemTotal,
         })),
         shippingAddress: {
-          firstName: "",
+          firstName: user?.userName || "User",
           lastName: "",
           address1: "",
           city: "",
           state: "",
           zipCode: "",
-          country: "",
+          country: "Ghana",
         },
       };
       const response = await createOrder(orderPayload, token);
