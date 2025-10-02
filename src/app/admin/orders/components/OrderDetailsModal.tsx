@@ -168,7 +168,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                 </div>
               </div>
               
-              {order.status !== "pending" && (
+              {order.status !== "new" && (
                 <div className="flex items-center gap-3">
                   <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
                   <div>
@@ -178,7 +178,7 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
                 </div>
               )}
 
-              {["preparing", "ready", "out-for-delivery", "delivered"].includes(order.status) && (
+              {["in_progress", "fulfilled", "out-for-delivery", "delivered"].includes(order.status) && (
                 <div className="flex items-center gap-3">
                   <div className="w-4 h-4 bg-orange-500 rounded-full"></div>
                   <div>

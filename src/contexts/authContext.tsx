@@ -22,7 +22,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-two-chi-43.vercel.app';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-mmow.vercel.app';
 
 // Admin phone number constant
 const ADMIN_PHONE_NUMBER = '0534686069';

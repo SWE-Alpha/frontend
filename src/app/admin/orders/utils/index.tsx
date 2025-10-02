@@ -4,13 +4,13 @@ import { Order, OrderStats } from "../types";
 
 export const getStatusColor = (status: string) => {
   switch (status) {
-    case "pending":
+    case "new":
       return "bg-yellow-100 text-yellow-800";
     case "confirmed":
       return "bg-blue-100 text-blue-800";
-    case "preparing":
+    case "in_progress":
       return "bg-orange-100 text-orange-800";
-    case "ready":
+    case "fulfilled":
       return "bg-purple-100 text-purple-800";
     case "out-for-delivery":
       return "bg-indigo-100 text-indigo-800";
@@ -25,13 +25,13 @@ export const getStatusColor = (status: string) => {
 
 export const getStatusIcon = (status: string) => {
   switch (status) {
-    case "pending":
+    case "new":
       return <Clock className="w-4 h-4" />;
     case "confirmed":
       return <Check className="w-4 h-4" />;
-    case "preparing":
+    case "in_progress":
       return <Package className="w-4 h-4" />;
-    case "ready":
+    case "fulfilled":
       return <Check className="w-4 h-4" />;
     case "out-for-delivery":
       return <Truck className="w-4 h-4" />;
@@ -45,9 +45,9 @@ export const getStatusIcon = (status: string) => {
 export const calculateOrderStats = (orders: Order[]): OrderStats => {
   return {
     total: orders.length,
-    pending: orders.filter((o) => o.status === "pending").length,
-    preparing: orders.filter((o) => o.status === "preparing").length,
-    ready: orders.filter((o) => o.status === "ready").length,
+    new: orders.filter((o) => o.status === "new").length,
+    in_progress: orders.filter((o) => o.status === "in_progress").length,
+    fulfilled: orders.filter((o) => o.status === "fulfilled").length,
     outForDelivery: orders.filter((o) => o.status === "out-for-delivery").length,
     delivered: orders.filter((o) => o.status === "delivered").length,
   };
@@ -70,62 +70,4 @@ export const filterOrders = (
   });
 };
 
-export const getMockOrders = (): Order[] => {
-  return [
-    {
-      id: "1",
-      orderNumber: "ORD-001",
-      customerName: "John Doe",
-      customerPhone: "+233 24 123 4567",
-      customerAddress: "123 Main St, Accra",
-      items: [
-        {
-          id: "1",
-          name: "Cherry Dog",
-          quantity: 2,
-          price: 20.0,
-          addOns: ["Cheese", "Fried Egg"],
-          note: "Extra spicy",
-        },
-        {
-          id: "2",
-          name: "Italian Panini",
-          quantity: 1,
-          price: 15.0,
-          addOns: [],
-        },
-      ],
-      total: 55.0,
-      status: "pending",
-      orderType: "delivery",
-      paymentMethod: "cash",
-      paymentStatus: "pending",
-      orderTime: "2023-05-15T10:30:00",
-      estimatedDelivery: "2023-05-15T11:30:00",
-      notes: "Please call before delivery",
-    },
-    {
-      id: "2",
-      orderNumber: "ORD-002",
-      customerName: "Jane Smith",
-      customerPhone: "+233 20 987 6543",
-      customerAddress: "456 Oak Ave, Kumasi",
-      items: [
-        {
-          id: "3",
-          name: "Chicken Wings",
-          quantity: 1,
-          price: 18.0,
-          addOns: ["BBQ Sauce"],
-        },
-      ],
-      total: 18.0,
-      status: "confirmed",
-      orderType: "pickup",
-      paymentMethod: "card",
-      paymentStatus: "paid",
-      orderTime: "2023-05-15T11:15:00",
-      estimatedDelivery: "2023-05-15T11:45:00",
-    },
-  ];
-};
+

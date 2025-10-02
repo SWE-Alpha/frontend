@@ -101,7 +101,12 @@ export const OrdersProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     const data = await res.json();
     console.log("Fetched Orders:", data);
-    setOrders(data.data);
+    // Normalize status to lowercase for all orders
+    const normalizedOrders = data.data.map((order: Order) => ({
+      ...order,
+      status: typeof order.status === "string" ? order.status.toLowerCase() : order.status,
+    }));
+    setOrders(normalizedOrders);
   } catch (error) {
     console.error("Error fetching Orders:", error);
   } finally {
