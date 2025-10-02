@@ -5,33 +5,39 @@ import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useOrders } from "@/contexts/orderContext";
 import type { Order as AdminOrder, OrderItem as AdminOrderItem } from "./types";
-import { calculateOrderStats, filterOrders, getMockOrders } from "./utils";
+import { calculateOrderStats, filterOrders } from "./utils";
 import { OrderStats, OrderFilters, OrderTable } from "./components";
+import { useCustomers } from "@/contexts/customerContext";
 
 export default function OrderManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { orders: contextOrders } = useOrders();
+  const { orders: contextOrders, refreshOrders: contextRefreshOrders } = useOrders();
+  const { customers } = useCustomers();
+
 
   // Map context orders to admin Order type
   const allowedStatuses = [
-    "pending",
+    "new",
     "confirmed",
-    "preparing",
-    "ready",
+    "in_progress",
+    "fulfilled",
     "out-for-delivery",
     "delivered",
     "cancelled",
   ];
   const adminOrders: AdminOrder[] = contextOrders.map((order) => {
-    // Map context Order to admin Order
+    // Find customer by order.customerId (or order.userId)
+    const customer = customers.find(
+      (c) => c.userName === order.customerName || c.id === order.userId
+    );
     return {
       id: order.id,
       orderNumber: order.orderNumber,
-      customerName: order.customerName,
-      customerPhone: order.shippingAddress?.phone ?? "",
+      customerName: customer?.userName ?? "",
+      customerPhone: customer?.number ?? "",
       customerAddress:
         order.shippingAddress
           ? `${order.shippingAddress.address1}${order.shippingAddress.address2 ? ", " + order.shippingAddress.address2 : ""}, ${order.shippingAddress.city}, ${order.shippingAddress.state}, ${order.shippingAddress.country}`
@@ -44,9 +50,9 @@ export default function OrderManagement() {
         addOns: [], // If you have addOns in context, map here
       })),
       total: typeof order.total === "number" ? order.total : Number(order.total),
-      status: allowedStatuses.includes(order.status)
+      status: allowedStatuses.includes(order.status.toLocaleLowerCase())
         ? (order.status as AdminOrder["status"])
-        : "pending",
+        : "new",
       orderType: "delivery",
       paymentMethod:
         (order.paymentMethod as AdminOrder["paymentMethod"]) ?? "cash", // fallback to cash
@@ -63,12 +69,13 @@ export default function OrderManagement() {
     // For now, this is a placeholder
   };
 
-  const refreshOrders = () => {
+  const refreshOrders = async () => {
     setIsLoading(true);
-    // Simulate API call or context refresh if available
-    setTimeout(() => {
+    try {
+      await contextRefreshOrders();
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const filteredOrders = filterOrders(adminOrders, searchQuery, statusFilter);
