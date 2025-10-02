@@ -15,7 +15,7 @@ export interface Order {
   customerAddress: string;
   items: OrderItem[];
   total: number;
-  status: "pending" | "confirmed" | "preparing" | "ready" | "out-for-delivery" | "delivered" | "cancelled";
+  status: "new" | "in_progress" | "fulfilled" | "out-for-delivery" | "delivered" | "cancelled";
   orderType: "delivery" | "pickup";
   paymentMethod: "cash" | "card" | "mobile-money";
   paymentStatus: "pending" | "paid" | "refunded";
@@ -26,9 +26,9 @@ export interface Order {
 
 export interface OrderStats {
   total: number;
-  pending: number;
-  preparing: number;
-  ready: number;
+  new: number;
+  in_progress: number;
+  fulfilled: number;
   outForDelivery: number;
   delivered: number;
 }
