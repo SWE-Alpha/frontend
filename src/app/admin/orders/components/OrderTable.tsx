@@ -92,7 +92,10 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onUpdateStatus }) => {
                 </div>
               </TableCell>
               <TableCell className="text-sm">
-                {new Date(order.orderTime).toLocaleTimeString([], {
+                {new Date(order.orderTime).toLocaleString([], {
+                  year: "numeric",
+                  month: "short",
+                  day: "2-digit",
                   hour: "2-digit",
                   minute: "2-digit",
                 })}
@@ -130,17 +133,17 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, onUpdateStatus }) => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem
-                        onClick={() => onUpdateStatus(order.id, "confirmed")}
+                        onClick={() => onUpdateStatus(order.id, "new")}
                       >
                         Confirm Order
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() => onUpdateStatus(order.id, "preparing")}
+                        onClick={() => onUpdateStatus(order.id, "in_progress")}
                       >
                         Start Preparing
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() => onUpdateStatus(order.id, "ready")}
+                        onClick={() => onUpdateStatus(order.id, "fulfilled")}
                       >
                         Mark Ready
                       </DropdownMenuItem>

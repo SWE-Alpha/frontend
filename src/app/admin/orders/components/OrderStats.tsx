@@ -13,15 +13,15 @@ const OrderStats: React.FC<OrderStatsProps> = ({ stats }) => {
         <div className="text-sm text-gray-600">Total Orders</div>
       </div>
       <div className="bg-white rounded-lg p-4 shadow-sm border">
-        <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+        <div className="text-2xl font-bold text-yellow-600">{stats.new}</div>
         <div className="text-sm text-gray-600">Pending</div>
       </div>
       <div className="bg-white rounded-lg p-4 shadow-sm border">
-        <div className="text-2xl font-bold text-orange-600">{stats.preparing}</div>
+        <div className="text-2xl font-bold text-orange-600">{stats.in_progress}</div>
         <div className="text-sm text-gray-600">Preparing</div>
       </div>
       <div className="bg-white rounded-lg p-4 shadow-sm border">
-        <div className="text-2xl font-bold text-purple-600">{stats.ready}</div>
+        <div className="text-2xl font-bold text-purple-600">{stats.fulfilled}</div>
         <div className="text-sm text-gray-600">Ready</div>
       </div>
       <div className="bg-white rounded-lg p-4 shadow-sm border">
