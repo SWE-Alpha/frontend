@@ -78,74 +78,7 @@ const FoodOrderingApp = () => {
   const { categories } = useCategories();
   const { products } = useProducts();
   const { addToCart, cartItems } = useCart();
-  // --- Checkout Modal State ---
-  //const [showCheckout, setShowCheckout] = useState(false);
-  //const [isPlacingOrder, setIsPlacingOrder] = useState(false);
-  // --- Checkout Handler ---
-  // const handleCheckout = async () => {
-  //   if (!isAuthenticated) {
-  //     setShowLoginModal(true);
-  //     return;
-  //   }
-  //   setShowCheckout(true);
-  //   setIsPlacingOrder(true);
-  //   try {
-  //     const token = localStorage.getItem("authToken");
-  //     if (!token) throw new Error("No auth token found");
 
-  //     // Sync local cart to backend before placing order
-  //     await syncCartToBackend(cartItems, token);
-          
-
-  //     console.log("Order customerName:", user?.userName);
-
-  //     const orderPayload: CreateOrderRequest = {
-  //       orderNumber: `ORD-${Date.now()}`,
-  //       customerName: user?.userName || "User",
-  //       subtotal: cartTotal,
-  //       tax: 0,
-  //       shipping: 7,
-  //       discount: 0,
-  //       total: cartTotal + 7,
-  //       items: cartItems.map((item) => ({
-  //         productId: item.id,
-  //         name: item.name,
-  //         quantity: item.quantity,
-  //         price: item.price,
-  //         total: item.itemTotal,
-  //       })),
-  //       shippingAddress: {
-  //         firstName: "",
-  //         lastName: "",
-  //         address1: "",
-  //         city: "",
-  //         state: "",
-  //         zipCode: "",
-  //         country: "",
-  //       },
-  //     };
-  //     const response = await createOrder(orderPayload, token);
-  //     if (response.success) {
-  //       clearCart();
-  //       setShowCheckout(false);
-  //       setIsPlacingOrder(false);
-  //       toast.success("Order placed successfully!");
-  //       setShowToast(true);
-  //       // Optionally redirect or show order summary
-  //     } else {
-  //       throw new Error(response.message || "Order failed");
-  //     }
-  //   } catch (err) {
-  //     setShowCheckout(false);
-  //     setIsPlacingOrder(false);
-  //     let message = "Unknown error";
-  //     if (err instanceof Error) {
-  //       message = err.message;
-  //     }
-  //     setToastMsg("Order failed: " + message);
-  //     setShowToast(true);
-  //   }
-  // };
   const { isAuthenticated, isAdmin, login, register } = useAuth();
   const router = useRouter();
 
@@ -287,17 +220,6 @@ const FoodOrderingApp = () => {
 
   return (
     <div className="w-full bg-white">
-
-      {/* Checkout Modal */}
-      {/* {showCheckout && (
-        <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
-          <div className="text-center p-6 max-w-sm w-full">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-orange-500 mx-auto mb-4"></div>
-            <h2 className="text-xl font-semibold mb-2">Processing Order...</h2>
-            <p className="text-gray-600">Please wait while we prepare your order</p>
-          </div>
-        </div>
-      )} */}
 
       <Toast
         message={toastMsg}
@@ -525,19 +447,6 @@ const FoodOrderingApp = () => {
           </div>
         ) : null}
       </div>
-
-      {/* Checkout Button (visible if cart has items) */}
-      {/* {cartCount > 0 && (
-        <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-40 px-4 py-3 flex justify-center">
-          <Button
-            className="w-full max-w-md bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3"
-            onClick={handleCheckout}
-            disabled={isPlacingOrder}
-          >
-            {isAuthenticated ? `Checkout - GHC ${(cartTotal + 7).toFixed(2)}` : 'Sign in to Checkout'}
-          </Button>
-        </div>
-      )} */}
 
       {/* Authentication Modals */}
       <LoginModal

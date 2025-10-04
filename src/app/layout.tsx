@@ -9,8 +9,12 @@ import { ProductsProvider } from "@/contexts/productContext";
 import { AuthProvider } from "@/contexts/authContext";
 
 export const metadata: Metadata = {
-  title: "E-commerce Frontend",
-  description: "Modern e-commerce application built with Next.js",
+  title: "Buddies Inn",
+  description: "Snacks and beverages delivered to your doorstep. Experience the taste of excellence with Buddies Inn.",
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
 };
 
 export default function RootLayout({
