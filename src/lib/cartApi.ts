@@ -20,7 +20,7 @@ export async function syncCartToBackend(cartItems: CartItem[], token: string): P
 
   // 2. Add all items
   for (const item of cartItems) {
-    await fetch(`${API_URL}/cart/items`, {
+    await fetch(`${API_URL}/api/cart/items`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
