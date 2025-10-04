@@ -11,6 +11,10 @@ import { AuthProvider } from "@/contexts/authContext";
 export const metadata: Metadata = {
   title: "E-commerce Frontend",
   description: "Modern e-commerce application built with Next.js",
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
 };
 
 export default function RootLayout({
