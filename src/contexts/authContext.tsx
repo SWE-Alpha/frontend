@@ -22,10 +22,28 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-mmow.vercel.app';
-
 // Admin phone number constant
 const ADMIN_PHONE_NUMBER = '0534686069';
+
+// Helper to explain network errors
+const explainError = (error: unknown) => {
+  const message = (error as any)?.message || '';
+  if (message.includes('aborted')) return 'Request timed out. Please try again.';
+  if (message.includes('Failed to fetch')) return 'Could not connect to server. Please check your internet connection.';
+  return message || 'An unexpected error occurred. Please try again.';
+};
+
+// Fetch with timeout
+async function fetchWithTimeout(input: RequestInfo, init?: RequestInit, timeoutMs = 10000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -44,10 +62,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const verifyToken = async (token: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+      const response = await fetchWithTimeout('/api/auth/me', {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
@@ -58,7 +74,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
         setUser(userWithAdminFlag);
       } else {
-
         localStorage.removeItem('authToken');
       }
     } catch (error) {
@@ -71,101 +86,77 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (credentials: { number: string }) => {
     try {
-      console.log('Attempting login with URL:', `${API_BASE_URL}/api/auth/login`);
-      console.log('Credentials:', credentials);
-      
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const response = await fetchWithTimeout('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
-
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
-        throw new Error(`Login failed: ${response.status} ${response.statusText}`);
+        let errorMessage = `${response.status} ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch {}
+        
+        if (response.status === 400) throw new Error('Phone number is required');
+        if (response.status === 401) throw new Error('Invalid phone number');
+        throw new Error(`Login failed: ${errorMessage}`);
       }
 
       const data = await response.json();
-      console.log('Login response data:', data);
+      if (!data?.success || !data?.data?.token) {
+        throw new Error('Invalid server response');
+      }
 
-      if (data.success && data.data) {
-        const { token, user: userData } = data.data;
-        
-        // Check if user is admin based on phone number
-        const userWithAdminFlag = {
-          ...userData,
-          isAdmin: userData.number === ADMIN_PHONE_NUMBER
-        };
-        
-        localStorage.setItem('authToken', token);
-        setUser(userWithAdminFlag);
-      } else {
-        throw new Error(data.error || data.message || 'Login failed');
-      }
+      const { token, user: userData } = data.data;
+      const userWithAdminFlag = {
+        ...userData,
+        isAdmin: userData.number === ADMIN_PHONE_NUMBER
+      };
+
+      localStorage.setItem('authToken', token);
+      setUser(userWithAdminFlag);
     } catch (error) {
-      console.error('Login error:', error);
-      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-        throw new Error('Network error: Could not connect to server. Please check your internet connection.');
-      }
-      throw error;
+      throw new Error(explainError(error));
     }
   };
 
-  const register = async (userData: { 
-    userName: string; 
-    number: string; 
-    address?: string; 
-  }) => {
+  const register = async (userData: { userName: string; number: string; address?: string }) => {
     try {
-      console.log('Attempting registration with URL:', `${API_BASE_URL}/api/auth/register`);
-      console.log('User data:', userData);
-      
-      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      const response = await fetchWithTimeout('/api/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
       });
 
-      console.log('Registration response status:', response.status);
-      console.log('Registration response ok:', response.ok);
-
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Registration error response:', errorText);
-        throw new Error(`Registration failed: ${response.status} ${response.statusText}`);
+        let errorMessage = `${response.status} ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch {}
+        
+        if (response.status === 409) throw new Error('Phone number already registered');
+        if (response.status === 400) throw new Error('Name and phone number are required');
+        throw new Error(`Registration failed: ${errorMessage}`);
       }
 
       const data = await response.json();
-      console.log('Registration response data:', data);
+      if (!data?.success || !data?.data?.token) {
+        throw new Error('Invalid server response');
+      }
 
-      if (data.success && data.data) {
-        const { token, user: newUser } = data.data;
-        
-        // Check if user is admin based on phone number
-        const userWithAdminFlag = {
-          ...newUser,
-          isAdmin: newUser.number === ADMIN_PHONE_NUMBER
-        };
-        
-        localStorage.setItem('authToken', token);
-        setUser(userWithAdminFlag);
-      } else {
-        throw new Error(data.error || data.message || 'Registration failed');
-      }
+      const { token, user: newUser } = data.data;
+      const userWithAdminFlag = {
+        ...newUser,
+        isAdmin: newUser.number === ADMIN_PHONE_NUMBER
+      };
+
+      localStorage.setItem('authToken', token);
+      setUser(userWithAdminFlag);
     } catch (error) {
-      console.error('Registration error:', error);
-      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-        throw new Error('Network error: Could not connect to server. Please check your internet connection.');
-      }
-      throw error;
+      throw new Error(explainError(error));
     }
   };
 
