@@ -52,7 +52,7 @@ export interface OrderResponse {
   message?: string;
 }
 
-const API_URL = 'https://backend-mmow.vercel.app';
+const URL = 'https://backend-mmow.vercel.app';
 
 export async function createOrder(order: CreateOrderRequest, token: string): Promise<OrderResponse> {
   const res = await fetch(`${API_URL}/api/orders`, {
