@@ -45,8 +45,8 @@ export default function CartPage() {
     vegetable: boolean;
   }) => {
     const activeAddOns = Object.entries(addOns)
-      .filter(([_, enabled]) => enabled)
-      .map(([key, _]) => {
+      .filter(([, enabled]) => enabled)
+      .map(([key]) => {
         switch (key) {
           case "friedEgg":
             return "Fried Egg";

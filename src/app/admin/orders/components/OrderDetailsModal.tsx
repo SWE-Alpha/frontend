@@ -12,7 +12,7 @@ interface OrderDetailsModalProps {
 
 const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
   order,
-  onUpdateStatus: _onUpdateStatus,
+  onUpdateStatus: _onUpdateStatus, // TODO: Implement status update functionality
 }) => {
   return (
     <div className="space-y-6">

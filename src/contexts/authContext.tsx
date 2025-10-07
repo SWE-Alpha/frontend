@@ -27,7 +27,7 @@ const ADMIN_PHONE_NUMBER = '0534686069';
 
 // Helper to explain network errors
 const explainError = (error: unknown) => {
-  const message = (error as any)?.message || '';
+  const message = (error as Error)?.message || '';
   if (message.includes('aborted')) return 'Request timed out. Please try again.';
   if (message.includes('Failed to fetch')) return 'Could not connect to server. Please check your internet connection.';
   return message || 'An unexpected error occurred. Please try again.';

@@ -64,8 +64,8 @@ export default function OrderManagement() {
     };
   });
 
-  const updateOrderStatus = (orderId: string, newStatus: AdminOrder["status"]) => {
-    // Implement status update logic here if needed (e.g., API call)
+  const updateOrderStatus = (_orderId: string, _newStatus: AdminOrder["status"]) => {
+    // TODO: Implement status update logic here (e.g., API call)
     // For now, this is a placeholder
   };
 
