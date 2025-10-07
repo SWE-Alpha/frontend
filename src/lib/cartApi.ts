@@ -1,7 +1,7 @@
 // API utility for syncing cart to backend
 import { CartItem } from "../app/cart-context";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend-mmow.vercel.app';
+const API_URL = 'https://backend-mmow.vercel.app';
 
 export interface SyncCartResponse {
   success: boolean;
