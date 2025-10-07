@@ -23,7 +23,7 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
-    const target = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '') || 'https://backend-mmow.vercel.app';
+    const target = 'https://backend-mmow.vercel.app';
     return [
       {
         source: '/api/:path*',
