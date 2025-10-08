@@ -8,7 +8,7 @@
  * @returns An object with isValid flag and a message if invalid
  */
 
-const phoneError: string = "Invalid Input";
+const phoneError: string = "Invalid Phone Number";
 export function validatePhoneNumber(number: string): { isValid: boolean; message?: string } {
   // Remove any spaces or hyphens that might have been entered
   const cleanNumber = number.replace(/[\s-]/g, '');
