@@ -43,6 +43,15 @@ export default function RegisterModal({
       setError('Please fill in all required fields');
       return;
     }
+    
+    // Validate phone number
+    const { validatePhoneNumber } = await import('@/lib/validation');
+    const validationResult = validatePhoneNumber(number);
+    
+    if (!validationResult.isValid) {
+      setError(validationResult.message || 'Invalid phone number format');
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -130,10 +139,13 @@ export default function RegisterModal({
                 value={formData.number}
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                placeholder="Enter your phone number"
+                placeholder="Enter your phone number (e.g., +233XXXXXXXXX or 0XXXXXXXXX)"
                 disabled={isLoading}
                 required
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Format: +233XXXXXXXXX or 0XXXXXXXXX (Ghana numbers only)
+              </p>
             </div>
 
             <div>
