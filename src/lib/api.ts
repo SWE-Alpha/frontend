@@ -17,6 +17,7 @@ export interface CreateOrderRequest {
   discount: number;
   total: number;
   items: OrderItem[];
+  deliveryType?: "delivery" | "pickup";
 
   // Optional fields
   shippingAddress?: {
@@ -45,20 +46,22 @@ export interface CreateOrderRequest {
   notes?: string;
 }
 
-
 export interface OrderResponse {
   success: boolean;
   data: CreateOrderRequest;
   message?: string;
 }
 
-const API_URL = 'https://backend-mmow.vercel.app';
+const API_URL = "https://backend-mmow.vercel.app";
 
-export async function createOrder(order: CreateOrderRequest, token: string): Promise<OrderResponse> {
+export async function createOrder(
+  order: CreateOrderRequest,
+  token: string
+): Promise<OrderResponse> {
   const res = await fetch(`${API_URL}/api/orders`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(order),

@@ -29,6 +29,7 @@ export default function CartPage() {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
+  const [deliveryType, setDeliveryType] = useState<"delivery" | "pickup">("delivery");
 
 
   const updateQuantity = (id: string, newQuantity: number) => {
@@ -85,9 +86,10 @@ export default function CartPage() {
         customerName: user?.userName || "User",
         subtotal: cartTotal,
         tax: 0,
-        shipping: 7,
+        shipping: deliveryType === "delivery" ? 7 : 2,
         discount: 0,
-        total: cartTotal + 7,
+        total: cartTotal + (deliveryType === "delivery" ? 7 : 2),
+        deliveryType: deliveryType,
         items: cartItems.map((item) => ({
           productId: item.id,
           name: item.name,
@@ -111,13 +113,21 @@ export default function CartPage() {
         console.log("Order created:", response.data);
         clearCart();
         setShowCheckout(false);
-        setToastMsg("Order placed successfully!");
+        const deliveryMessage = deliveryType === "delivery" 
+          ? "Your order will be delivered to your address shortly." 
+          : "Your order will be ready for pickup shortly.";
+        
+        setToastMsg(`Order placed successfully! ${deliveryMessage}`);
         setShowToast(true);
+        
+        // Store toast state in localStorage for persistence
+        localStorage.setItem('toastMsg', `Order placed successfully! ${deliveryMessage}`);
+        localStorage.setItem('showToast', 'true');
+        
         // Redirect
         setTimeout(() => {
           router.push("/");
         }, 1500);
-        setShowToast(true);
       } else {
         throw new Error(response.message || "Order failed");
       }
@@ -312,6 +322,41 @@ export default function CartPage() {
                   ))}
                 </div>
 
+                {/* Delivery Type Selection */}
+                <div className="bg-white border rounded-lg p-4 mb-4">
+                  <h3 className="font-semibold mb-3">Delivery Option</h3>
+                  <div className="space-y-3">
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="deliveryType"
+                        value="delivery"
+                        checked={deliveryType === "delivery"}
+                        onChange={(e) => setDeliveryType(e.target.value as "delivery" | "pickup")}
+                        className="h-4 w-4 text-orange-500"
+                      />
+                      <div>
+                        <div className="font-medium">Home Delivery</div>
+                        <div className="text-sm text-gray-500">Get your order delivered to your doorstep</div>
+                      </div>
+                    </label>
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="deliveryType"
+                        value="pickup"
+                        checked={deliveryType === "pickup"}
+                        onChange={(e) => setDeliveryType(e.target.value as "delivery" | "pickup")}
+                        className="h-4 w-4 text-orange-500"
+                      />
+                      <div>
+                        <div className="font-medium">Pickup</div>
+                        <div className="text-sm text-gray-500">Pick up your order from the restaurant</div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
                 {/* Order Summary */}
                 <div className="bg-gray-50 rounded-lg p-4 mb-6">
                   <h3 className="font-semibold mb-3">Order Summary</h3>
@@ -321,8 +366,8 @@ export default function CartPage() {
                       <span>GHC {cartTotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Delivery Fee</span>
-                      <span>GHC 5.00</span>
+                      <span>{deliveryType === "delivery" ? "Delivery Fee" : "Pickup Fee"}</span>
+                      <span>{deliveryType === "delivery" ? "GHC 5.00" : "FREE"}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Service Fee</span>
@@ -331,7 +376,7 @@ export default function CartPage() {
                     <hr className="my-2" />
                     <div className="flex justify-between font-semibold text-base">
                       <span>Total</span>
-                      <span>GHC {(cartTotal + 7).toFixed(2)}</span>
+                      <span>GHC {(cartTotal + (deliveryType === "delivery" ? 7 : 2)).toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -343,7 +388,7 @@ export default function CartPage() {
                     onClick={handleCheckout}
                   >
                     {isAuthenticated
-                      ? `Checkout - GHC ${(cartTotal + 7).toFixed(2)}`
+                      ? `Checkout - GHC ${(cartTotal + (deliveryType === "delivery" ? 7 : 2)).toFixed(2)}`
                       : "Sign in to Checkout"}
                   </Button>
                   <Button
