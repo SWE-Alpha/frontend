@@ -13,6 +13,7 @@ import {
   HomeIcon,
   ArrowRightOnRectangleIcon,
   Cog6ToothIcon,
+  ClipboardDocumentListIcon,
 } from "@heroicons/react/24/outline";
 import LoginModal from "./LoginModal";
 import RegisterModal from "./RegisterModal";
@@ -31,13 +32,37 @@ const Navbar: React.FC = () => {
   };
 
   const handleLogin = async (credentials: { number: string }) => {
-    await login(credentials);
+    const loggedInUser = await login(credentials);
     setShowLoginModal(false);
+    
+    // Show success toast with first name
+    if (typeof window !== 'undefined' && window.showToast) {
+      const firstName = loggedInUser.userName.split(' ')[0];
+      window.showToast(`Welcome back, ${firstName}!`, 'success');
+    }
   };
 
   const handleRegister = async (userData: { userName: string; number: string; address?: string }) => {
-    await register(userData);
+    const registeredUser = await register(userData);
     setShowRegisterModal(false);
+    
+    // Show success toast with first name
+    if (typeof window !== 'undefined' && window.showToast) {
+      const firstName = registeredUser.userName.split(' ')[0];
+      window.showToast(`Welcome to Buddies Inn, ${firstName}!`, 'success');
+    }
+  };
+
+  const handleLogout = () => {
+    const userName = user?.userName;
+    logout();
+    setIsDrawerOpen(false);
+    
+    // Show logout toast
+    if (typeof window !== 'undefined' && window.showToast) {
+      const firstName = userName?.split(' ')[0] || 'User';
+      window.showToast(`Goodbye, ${firstName}! See you soon!`, 'info');
+    }
   };
 
   const switchToRegister = () => {
@@ -98,10 +123,10 @@ const Navbar: React.FC = () => {
           <div className="p-6 border-b border-gray-100">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
+                <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center animate-fadeInScale">
                   <UserIcon className="w-6 h-6 text-white" />
                 </div>
-                <div>
+                <div className="animate-slideInUp">
                   <h2 className="text-lg font-semibold text-gray-900">
                     {isAuthenticated ? user?.userName || 'User' : 'Buddies Inn'}
                   </h2>
@@ -137,6 +162,20 @@ const Navbar: React.FC = () => {
                   </li>
                 );
               })}
+              
+              {/* Orders Link - Only show for authenticated users */}
+              {isAuthenticated && !pathname?.startsWith("/admin") && (
+                <li>
+                  <Link
+                    href="/orders"
+                    className="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors text-gray-700 hover:bg-gray-50 w-full"
+                    onClick={() => setIsDrawerOpen(false)}
+                  >
+                    <ClipboardDocumentListIcon className="w-5 h-5 mr-3" />
+                    My Orders
+                  </Link>
+                </li>
+              )}
               
               {/* Authentication Section */}
               <li className="border-t border-gray-200 pt-3 mt-3">
@@ -177,10 +216,7 @@ const Navbar: React.FC = () => {
                       </Link>
                     )}
                     <button
-                      onClick={() => {
-                        logout();
-                        setIsDrawerOpen(false);
-                      }}
+                      onClick={handleLogout}
                       className="w-full flex items-center px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors text-left"
                     >
                       <ArrowRightOnRectangleIcon className="w-5 h-5 mr-3" />
@@ -200,6 +236,7 @@ const Navbar: React.FC = () => {
         onClose={() => setShowLoginModal(false)}
         onLogin={handleLogin}
         onSwitchToRegister={switchToRegister}
+        user={user}
       />
 
       <RegisterModal

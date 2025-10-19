@@ -15,8 +15,8 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
   isLoading: boolean;
-  login: (credentials: { number: string }) => Promise<void>;
-  register: (userData: { userName: string; number: string; address?: string }) => Promise<void>;
+  login: (credentials: { number: string }) => Promise<User>;
+  register: (userData: { userName: string; number: string; address?: string }) => Promise<User>;
   logout: () => void;
 }
 
@@ -117,6 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       localStorage.setItem('authToken', token);
       setUser(userWithAdminFlag);
+      return userWithAdminFlag;
     } catch (error) {
       throw new Error(explainError(error));
     }
@@ -155,6 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       localStorage.setItem('authToken', token);
       setUser(userWithAdminFlag);
+      return userWithAdminFlag;
     } catch (error) {
       throw new Error(explainError(error));
     }

@@ -7,6 +7,8 @@ import { Toaster } from 'sonner';
 import { CategoriesProvider } from "@/contexts/categoryContext";
 import { ProductsProvider } from "@/contexts/productContext";
 import { AuthProvider } from "@/contexts/authContext";
+import { OrderProvider } from "@/contexts/orderTrackingContext";
+import LayoutClient from "./layout-client";
 
 export const metadata: Metadata = {
   title: "Buddies Inn",
@@ -29,14 +31,18 @@ export default function RootLayout({
           <CategoriesProvider>
             <ProductsProvider>
               <CartProvider>
-                <div className="flex-grow">
-                  <Navbar />
-                  <main className="min-h-[calc(100vh-200px)]">
-                    {children}
-                  </main>
-                </div>
-                <Footer className="mt-auto" />
-                <Toaster position="top-center" />
+                <OrderProvider>
+                  <LayoutClient>
+                    <div className="flex-grow">
+                      <Navbar />
+                      <main className="min-h-[calc(100vh-200px)]">
+                        {children}
+                      </main>
+                    </div>
+                    <Footer className="mt-auto" />
+                    <Toaster position="top-center" />
+                  </LayoutClient>
+                </OrderProvider>
               </CartProvider>
             </ProductsProvider>
           </CategoriesProvider>

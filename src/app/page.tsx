@@ -79,7 +79,7 @@ const FoodOrderingApp = () => {
   const { products } = useProducts();
   const { addToCart, cartItems } = useCart();
 
-  const { isAuthenticated, isAdmin, login, register } = useAuth();
+  const { isAuthenticated, isAdmin, login, register, user } = useAuth();
   const router = useRouter();
 
   // Redirect admin users to admin page
@@ -98,8 +98,15 @@ const FoodOrderingApp = () => {
 
   // Authentication handlers
   const handleLogin = async (credentials: { number: string }) => {
-    await login(credentials);
+    const loggedInUser = await login(credentials);
     setShowLoginModal(false);
+    
+    // Show success toast with first name
+    if (typeof window !== 'undefined' && window.showToast) {
+      const firstName = loggedInUser.userName.split(' ')[0];
+      window.showToast(`Welcome back, ${firstName}!`, 'success');
+    }
+    
     // Sync cart to backend after login
     const token = localStorage.getItem("authToken");
     if (token) {
@@ -118,8 +125,15 @@ const FoodOrderingApp = () => {
     number: string;
     address?: string;
   }) => {
-    await register(userData);
+    const registeredUser = await register(userData);
     setShowRegisterModal(false);
+    
+    // Show success toast with first name
+    if (typeof window !== 'undefined' && window.showToast) {
+      const firstName = registeredUser.userName.split(' ')[0];
+      window.showToast(`Welcome to Buddies Inn, ${firstName}!`, 'success');
+    }
+    
     // Sync cart to backend after register
     const token = localStorage.getItem("authToken");
     if (token) {
@@ -454,6 +468,7 @@ const FoodOrderingApp = () => {
         onClose={() => setShowLoginModal(false)}
         onLogin={handleLogin}
         onSwitchToRegister={switchToRegister}
+        user={user}
       />
       <RegisterModal
         isOpen={showRegisterModal}

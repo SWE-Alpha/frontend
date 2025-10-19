@@ -12,6 +12,8 @@ import LoginModal from "@/components/LoginModal";
 import RegisterModal from "@/components/RegisterModal";
 import { createOrder, CreateOrderRequest } from "@/lib/api";
 import { syncCartToBackend } from "@/lib/cartApi";
+import { useOrders } from "@/contexts/orderTrackingContext";
+import type { Order as TrackingOrder } from "@/contexts/orderTrackingContext";
 
 export default function CartPage() {
   const router = useRouter();
@@ -24,6 +26,7 @@ export default function CartPage() {
     cartCount,
   } = useCart();
   const { user, isAuthenticated, login, register } = useAuth();
+  const { addOrder } = useOrders();
   const [showCheckout, setShowCheckout] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
@@ -111,6 +114,29 @@ export default function CartPage() {
       if (response.success) {
         console.log("Username:", user?.userName);
         console.log("Order created:", response.data);
+        
+        // Create order for tracking
+        const trackingOrder: TrackingOrder = {
+          id: Date.now().toString(), // Use timestamp as fallback ID
+          orderNumber: orderPayload.orderNumber,
+          customerName: orderPayload.customerName,
+          customerPhone: user?.number || "",
+          items: orderPayload.items.map(item => ({
+            id: item.productId,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price
+          })),
+          total: orderPayload.total,
+          deliveryType: deliveryType,
+          currentStatus: "received",
+          estimatedCompletionTime: new Date(Date.now() + 45 * 60 * 1000), // 45 minutes from now
+          createdAt: new Date(),
+        };
+        
+        // Add to order tracking context
+        addOrder(trackingOrder);
+        
         clearCart();
         setShowCheckout(false);
         const deliveryMessage = deliveryType === "delivery" 
@@ -124,9 +150,12 @@ export default function CartPage() {
         localStorage.setItem('toastMsg', `Order placed successfully! ${deliveryMessage}`);
         localStorage.setItem('showToast', 'true');
         
-        // Redirect
+        // Store order ID for tracking
+        const orderId = trackingOrder.id;
+        
+        // Redirect to order tracking page
         setTimeout(() => {
-          router.push("/");
+          router.push(`/orders/${orderId}`);
         }, 1500);
       } else {
         throw new Error(response.message || "Order failed");
@@ -147,8 +176,15 @@ export default function CartPage() {
 
 
   const handleLogin = async (credentials: { number: string }) => {
-    await login(credentials);
+    const loggedInUser = await login(credentials);
     setShowLoginModal(false);
+    
+    // Show success toast with first name
+    if (typeof window !== 'undefined' && window.showToast) {
+      const firstName = loggedInUser.userName.split(' ')[0];
+      window.showToast(`Welcome back, ${firstName}!`, 'success');
+    }
+    
     // After successful login, proceed with checkout
     handleCheckout();
   };
@@ -158,8 +194,15 @@ export default function CartPage() {
     number: string;
     address?: string;
   }) => {
-    await register(userData);
+    const registeredUser = await register(userData);
     setShowRegisterModal(false);
+    
+    // Show success toast with first name
+    if (typeof window !== 'undefined' && window.showToast) {
+      const firstName = registeredUser.userName.split(' ')[0];
+      window.showToast(`Welcome to Buddies Inn, ${firstName}!`, 'success');
+    }
+    
     // After successful registration, proceed with checkout
     handleCheckout();
   };
@@ -411,6 +454,7 @@ export default function CartPage() {
         onClose={() => setShowLoginModal(false)}
         onLogin={handleLogin}
         onSwitchToRegister={switchToRegister}
+        user={user}
       />
 
       {/* Register Modal */}
