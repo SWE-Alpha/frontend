@@ -33,6 +33,7 @@ export default function CartPage() {
   const [showToast, setShowToast] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
   const [deliveryType, setDeliveryType] = useState<"delivery" | "pickup">("delivery");
+  const [paymentMethod, setPaymentMethod] = useState<"cash" | "mobile-money">("cash");
 
 
   const updateQuantity = (id: string, newQuantity: number) => {
@@ -93,6 +94,7 @@ export default function CartPage() {
         discount: 0,
         total: cartTotal + (deliveryType === "delivery" ? 7 : 2),
         deliveryType: deliveryType,
+        paymentMethod: paymentMethod,
         items: cartItems.map((item) => ({
           productId: item.id,
           name: item.name,
@@ -120,6 +122,7 @@ export default function CartPage() {
           id: Date.now().toString(), // Use timestamp as fallback ID
           orderNumber: orderPayload.orderNumber,
           customerName: orderPayload.customerName,
+          paymentMethod: paymentMethod,
           customerPhone: user?.number || "",
           items: orderPayload.items.map(item => ({
             id: item.productId,
@@ -399,6 +402,41 @@ export default function CartPage() {
                     </label>
                   </div>
                 </div>
+
+                  {/* Payment Method Selection */}
+                  <div className="bg-white border rounded-lg p-4 mb-4">
+                    <h3 className="font-semibold mb-3">Payment Method</h3>
+                    <div className="space-y-3">
+                      <label className="flex items-center space-x-3 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="cash"
+                          checked={paymentMethod === "cash"}
+                          onChange={(e) => setPaymentMethod(e.target.value as "cash" | "mobile-money")}
+                          className="h-4 w-4 text-orange-500"
+                        />
+                        <div>
+                          <div className="font-medium">Cash</div>
+                          <div className="text-sm text-gray-500">Pay with cash on delivery or pickup</div>
+                        </div>
+                      </label>
+                      <label className="flex items-center space-x-3 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="mobile-money"
+                          checked={paymentMethod === "mobile-money"}
+                          onChange={(e) => setPaymentMethod(e.target.value as "cash" | "mobile-money")}
+                          className="h-4 w-4 text-orange-500"
+                        />
+                        <div>
+                          <div className="font-medium">Mobile Money (Momo)</div>
+                          <div className="text-sm text-gray-500">Pay via mobile money transfer</div>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
 
                 {/* Order Summary */}
                 <div className="bg-gray-50 rounded-lg p-4 mb-6">

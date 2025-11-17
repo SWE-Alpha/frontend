@@ -28,14 +28,16 @@ const ORDER_STATUSES = {
 };
 
 export default function OrderManagement() {
-  const { orders, updateOrderStatus: updateContextOrderStatus, refreshOrders } = useOrders();
+  const { orders, updateOrderStatus: updateContextOrderStatus, refreshOrders, setEstimatedCompletionTime, clearEstimatedCompletionTime } = useOrders();
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [deliveryTypeFilter, setDeliveryTypeFilter] = useState("all");
+  const [dayFilter, setDayFilter] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showOrderDetails, setShowOrderDetails] = useState(false);
+  const [etaMinutes, setEtaMinutes] = useState<number>(0);
 
   // Filter orders based on search and filters
   useEffect(() => {
@@ -57,8 +59,20 @@ export default function OrderManagement() {
       filtered = filtered.filter(order => order.deliveryType === deliveryTypeFilter);
     }
 
+    // Filter by selected day (YYYY-MM-DD) using local date (avoids UTC mismatch).
+    const toLocalISODate = (d: Date) => {
+      const dt = new Date(d);
+      const y = dt.getFullYear();
+      const m = String(dt.getMonth() + 1).padStart(2, "0");
+      const day = String(dt.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    };
+    if (dayFilter) {
+      filtered = filtered.filter(order => toLocalISODate(new Date(order.createdAt)) === dayFilter);
+    }
+
     setFilteredOrders(filtered);
-  }, [orders, searchQuery, statusFilter, deliveryTypeFilter]);
+  }, [orders, searchQuery, statusFilter, deliveryTypeFilter, dayFilter]);
 
   const getStatusInfo = (status: string, deliveryType: "delivery" | "pickup") => {
     const statuses = ORDER_STATUSES[deliveryType];
@@ -76,11 +90,13 @@ export default function OrderManagement() {
 
     // Update selected order if viewing details
     if (selectedOrder?.id === orderId) {
-      setSelectedOrder(prev => prev ? { 
-        ...prev, 
-        currentStatus: newStatus,
-        estimatedCompletionTime: new Date(Date.now() + getEstimatedTime(newStatus) * 60 * 1000)
-      } : null);
+      setSelectedOrder(prev => prev ? (
+        prev.etaOverridden ? { ...prev, currentStatus: newStatus } : { 
+          ...prev, 
+          currentStatus: newStatus,
+          estimatedCompletionTime: new Date(Date.now() + getEstimatedTime(newStatus) * 60 * 1000)
+        }
+      ) : null);
     }
   };
 
@@ -133,6 +149,33 @@ export default function OrderManagement() {
   };
 
   const stats = getOrderStats();
+
+  useEffect(() => {
+    if (selectedOrder) {
+      const diffMinutes = Math.ceil((selectedOrder.estimatedCompletionTime.getTime() - Date.now()) / (1000 * 60));
+      setEtaMinutes(diffMinutes > 0 ? diffMinutes : 0);
+    } else {
+      setEtaMinutes(0);
+    }
+  }, [selectedOrder]);
+
+  const handleSetEta = () => {
+    if (!selectedOrder) return;
+    const minutes = Math.max(0, Math.floor(etaMinutes));
+    const date = new Date(Date.now() + minutes * 60 * 1000);
+    setEstimatedCompletionTime(selectedOrder.id, date);
+    setSelectedOrder(prev => prev ? { ...prev, estimatedCompletionTime: date } : prev);
+  };
+
+  const handleResetEta = () => {
+    if (!selectedOrder) return;
+    // Clear manual override so algorithm resumes
+    clearEstimatedCompletionTime(selectedOrder.id);
+    const date = new Date(Date.now() + getEstimatedTime(selectedOrder.currentStatus) * 60 * 1000);
+    setSelectedOrder(prev => prev ? { ...prev, etaOverridden: false, estimatedCompletionTime: date } : prev);
+    const diffMinutes = Math.ceil((date.getTime() - Date.now()) / (1000 * 60));
+    setEtaMinutes(diffMinutes > 0 ? diffMinutes : 0);
+  };
 
   if (isLoading) {
     return (
@@ -217,6 +260,28 @@ export default function OrderManagement() {
             </div>
           </div>
           <div className="flex gap-2">
+            <div className="flex items-center gap-2">
+              <input
+                type="date"
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                value={dayFilter ?? ""}
+                onChange={(e) => setDayFilter(e.target.value ? e.target.value : null)}
+              />
+              <button
+                type="button"
+                onClick={() => setDayFilter(new Date().toISOString().split('T')[0])}
+                className="px-3 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+              >
+                Today
+              </button>
+              <button
+                type="button"
+                onClick={() => setDayFilter(null)}
+                className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Clear
+              </button>
+            </div>
             <select
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               value={statusFilter}
@@ -299,8 +364,15 @@ export default function OrderManagement() {
                     </td>
                     <td className="py-3 px-4">
                       <div>
-                        <p className="text-sm text-gray-600">{getTimeAgo(order.createdAt)}</p>
-                        <p className="text-xs text-gray-500">ETA: {formatTime(order.estimatedCompletionTime)}</p>
+                        {/* Hide timers once delivered/completed */}
+                        {!(order.currentStatus === 'delivered' || order.currentStatus === 'completed') ? (
+                          <>
+                            <p className="text-sm text-gray-600">{getTimeAgo(order.createdAt)}</p>
+                            <p className="text-xs text-gray-500">ETA: {formatTime(order.estimatedCompletionTime)}</p>
+                          </>
+                        ) : (
+                          <p className="text-sm text-gray-600">&nbsp;</p>
+                        )}
                       </div>
                     </td>
                     <td className="py-3 px-4">
@@ -382,10 +454,12 @@ export default function OrderManagement() {
                     <p className="font-medium">{selectedOrder.customerAddress}</p>
                   </div>
                 )}
-                <div className="col-span-2">
-                  <p className="text-sm text-gray-500">Estimated Completion</p>
-                  <p className="font-medium">{formatTime(selectedOrder.estimatedCompletionTime)}</p>
-                </div>
+                {!(selectedOrder.currentStatus === 'delivered' || selectedOrder.currentStatus === 'completed') && (
+                  <div className="col-span-2">
+                    <p className="text-sm text-gray-500">Estimated Completion</p>
+                    <p className="font-medium">{formatTime(selectedOrder.estimatedCompletionTime)}</p>
+                  </div>
+                )}
               </div>
 
               {/* Items */}
@@ -409,6 +483,28 @@ export default function OrderManagement() {
               </div>
 
               {/* Status Update */}
+              {/* ETA Adjustment (admin override) */}
+              {!(selectedOrder.currentStatus === 'delivered' || selectedOrder.currentStatus === 'completed') && (
+                <div className="mb-4">
+                  <h3 className="font-medium text-gray-800 mb-2">Adjust ETA (minutes from now)</h3>
+                  <div className="flex items-center gap-2 mb-2">
+                    <input
+                      type="number"
+                      min={0}
+                      value={etaMinutes}
+                      onChange={(e) => setEtaMinutes(Number(e.target.value))}
+                      className="w-24 px-2 py-1 border border-gray-300 rounded-lg"
+                    />
+                    <Button size="sm" className="bg-orange-500 hover:bg-orange-600 text-white" onClick={handleSetEta}>
+                      Set ETA
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={handleResetEta}>
+                      Reset to Auto
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               <div className="mb-6">
                 <h3 className="font-medium text-gray-800 mb-3">Update Status</h3>
                 <div className="grid grid-cols-2 gap-2">

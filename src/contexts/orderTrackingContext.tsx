@@ -18,8 +18,10 @@ interface Order {
   items: OrderItem[];
   total: number;
   deliveryType: "delivery" | "pickup";
+  paymentMethod?: "cash" | "card" | "mobile-money";
   currentStatus: string;
   estimatedCompletionTime: Date;
+  etaOverridden?: boolean;
   createdAt: Date;
   notes?: string;
 }
@@ -29,6 +31,8 @@ interface OrderContextType {
   currentOrder: Order | null;
   addOrder: (order: Order) => void;
   updateOrderStatus: (orderId: string, newStatus: string) => void;
+  setEstimatedCompletionTime: (orderId: string, date: Date) => void;
+  clearEstimatedCompletionTime: (orderId: string) => void;
   getOrderById: (orderId: string) => Order | undefined;
   refreshOrders: () => Promise<void>;
 }
@@ -67,26 +71,45 @@ export function OrderProvider({ children }: { children: ReactNode }) {
   };
 
   const updateOrderStatus = (orderId: string, newStatus: string) => {
-    setOrders(prev => prev.map(order => 
-      order.id === orderId 
-        ? { 
-            ...order, 
-            currentStatus: newStatus,
-            estimatedCompletionTime: new Date(Date.now() + getEstimatedTime(newStatus) * 60 * 1000)
-          }
+    setOrders(prev => prev.map(order => {
+      if (order.id !== orderId) return order;
+      // If admin manually overrode ETA, keep their ETA but update status
+      if (order.etaOverridden) {
+        return { ...order, currentStatus: newStatus };
+      }
+      return {
+        ...order,
+        currentStatus: newStatus,
+        estimatedCompletionTime: new Date(Date.now() + getEstimatedTime(newStatus) * 60 * 1000)
+      };
+    }));
+
+    // Update current order if it's the one being updated
+    setCurrentOrder(prev => {
+      if (!prev || prev.id !== orderId) return prev;
+      if (prev.etaOverridden) return { ...prev, currentStatus: newStatus };
+      return { ...prev, currentStatus: newStatus, estimatedCompletionTime: new Date(Date.now() + getEstimatedTime(newStatus) * 60 * 1000) };
+    });
+  };
+
+  const setEstimatedCompletionTime = (orderId: string, date: Date) => {
+    setOrders(prev => prev.map(order =>
+      order.id === orderId
+        ? { ...order, estimatedCompletionTime: new Date(date), etaOverridden: true }
         : order
     ));
 
-    // Update current order if it's the one being updated
-    setCurrentOrder(prev => 
-      prev?.id === orderId 
-        ? { 
-            ...prev, 
-            currentStatus: newStatus,
-            estimatedCompletionTime: new Date(Date.now() + getEstimatedTime(newStatus) * 60 * 1000)
-          }
-        : prev
-    );
+    setCurrentOrder(prev => prev && prev.id === orderId ? { ...prev, estimatedCompletionTime: new Date(date), etaOverridden: true } : prev);
+  };
+
+  const clearEstimatedCompletionTime = (orderId: string) => {
+    setOrders(prev => prev.map(order =>
+      order.id === orderId
+        ? { ...order, etaOverridden: false, estimatedCompletionTime: new Date(Date.now() + getEstimatedTime(order.currentStatus) * 60 * 1000) }
+        : order
+    ));
+
+    setCurrentOrder(prev => prev && prev.id === orderId ? { ...prev, etaOverridden: false, estimatedCompletionTime: new Date(Date.now() + getEstimatedTime(prev.currentStatus) * 60 * 1000) } : prev);
   };
 
   const getOrderById = (orderId: string): Order | undefined => {
@@ -125,6 +148,8 @@ export function OrderProvider({ children }: { children: ReactNode }) {
     currentOrder,
     addOrder,
     updateOrderStatus,
+    setEstimatedCompletionTime,
+    clearEstimatedCompletionTime,
     getOrderById,
     refreshOrders,
   };
